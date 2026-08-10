@@ -1,0 +1,40 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/agent-config",
+    "crates/session-store",
+    "crates/central-client",
+    "crates/heartbeat",
+    "crates/fas-server",
+    "crates/agent",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["ru5ty-gate contributors"]
+repository = "https://github.com/prav-raghu/ru5ty-gate"
+
+[workspace.dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "time", "sync"] }
+axum = { version = "0.7", features = ["query"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "1"
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# Workspace-local crates
+agent-config = { path = "crates/agent-config" }
+session-store = { path = "crates/session-store" }
+central-client = { path = "crates/central-client" }
+heartbeat = { path = "crates/heartbeat" }
+fas-server = { path = "crates/fas-server" }
