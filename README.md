@@ -1,4 +1,12 @@
-# ru5ty-gate
+# Ru5ty Gate
+
+<p align="left">
+  <img
+    src="https://res.cloudinary.com/dbqg2azyd/image/upload/v1786455709/0809d997-dc1a-41fb-a86e-f3b23e5f809d.png"
+    alt="Ru5ty Gate"
+    width="250"
+  />
+</p>
 
 Router-side daemon that runs alongside [openNDS](https://opennds.readthedocs.io/)
 on captive-portal hardware (targeted at a GL-iNet GL-MT6000 running OpenWrt).
