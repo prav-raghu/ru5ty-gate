@@ -27,8 +27,10 @@ pub struct VerifyLoginMfaRequest {
 #[derive(Debug, Clone, Deserialize, Validate)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct RefreshTokenRequest {
+    #[serde(default)]
     #[validate(length(max = 2048))]
-    pub refresh_token: String,
+    pub refresh_token: Option<String>,
+    #[serde(default)]
     pub remember_me: bool,
 }
 

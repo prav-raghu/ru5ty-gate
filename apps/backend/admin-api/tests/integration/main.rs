@@ -3,6 +3,7 @@
 #[path = "../common/mod.rs"]
 mod common;
 mod device_api;
+mod refresh_cookie;
 
 use axum::body::Body;
 use axum::http::{Method, Request, StatusCode};
@@ -86,6 +87,9 @@ async fn login_me_and_protected_route_flow(pool: PgPool) {
     assert_eq!(me_status, StatusCode::OK);
     assert_eq!(me["username"], name.as_str());
     assert_eq!(me["roles"]["name"], "Super Admin");
+    let permissions = me["permissions"].as_array().unwrap();
+    assert!(permissions.iter().any(|value| value == "venue:write"));
+    assert!(permissions.iter().any(|value| value == "venue:read"));
     assert_eq!(roles_status, StatusCode::OK);
     assert_eq!(roles["data"].as_array().unwrap().len(), 4);
 }
@@ -173,6 +177,20 @@ async fn permissions_gate_each_route_group(pool: PgPool) {
         Some(&moderator),
     )
     .await;
+
+    let (_, moderator_me) =
+        call(&app, Method::GET, "/api/v1/auth/me", None, Some(&moderator)).await;
+    let moderator_permissions = moderator_me["permissions"].as_array().unwrap();
+    assert!(
+        moderator_permissions
+            .iter()
+            .any(|value| value == "venue:read")
+    );
+    assert!(
+        !moderator_permissions
+            .iter()
+            .any(|value| value == "venue:write")
+    );
 
     assert_eq!(support_reports, StatusCode::OK);
     assert_eq!(support_export, StatusCode::FORBIDDEN);

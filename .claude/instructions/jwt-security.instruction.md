@@ -65,7 +65,7 @@ The request is then authenticated against `iat < minIat`, strictly less-than. Th
 
 ## Delivery
 
-The API returns `accessToken` and `refreshToken` in the JSON body. Clients send the refresh token in the body of `POST /auth/refresh`. When a client app stores it in a cookie, the cookie is `HttpOnly`, `Secure`, `SameSite=Strict`.
+The API returns `accessToken` and `refreshToken` in the JSON body. Clients send the refresh token in the body of `POST /auth/refresh`. `admin-api` additionally sets it as the `rg_refresh` cookie (`HttpOnly`, `SameSite=Strict`, `Secure` in production, `Path=/api/v1/auth`, `Max-Age` equal to the refresh lifetime) and accepts it on `POST /auth/refresh` when the body has no `refreshToken`. `admin-web` keeps only the access token in memory, restores the session on load by calling `/auth/refresh` with the cookie, and refreshes once on a 401 before retrying. Any other cookie use keeps the same attributes.
 
 ## MFA
 

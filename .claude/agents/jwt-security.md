@@ -24,7 +24,7 @@ Copy those patterns into any new service's auth domain rather than re-deriving t
 - MFA challenge token: 5 minutes, `type = "mfa_challenge"`, only an `id`. It is not a session and `authenticate` rejects it.
 - Both secrets must be at least 32 characters; `AuthConfig::from_env` refuses to start otherwise. The access and refresh secrets must differ.
 - Verification pins the algorithm to HS256, requires `exp`, and uses zero leeway. A token with the wrong `type` is rejected even when the signature is valid.
-- The refresh token is returned in the JSON body (`refreshToken`) and sent back in the body of `POST /auth/refresh`. If an app moves it to a cookie, it must be `HttpOnly`, `Secure`, `SameSite=Strict`.
+- The refresh token is returned in the JSON body (`refreshToken`) and sent back in the body of `POST /auth/refresh`. `admin-api` also sets it as the `rg_refresh` cookie (`HttpOnly`, `SameSite=Strict`, `Secure` in production, `Path=/api/v1/auth`) on login, MFA verification and refresh, clears it on logout and on a failed refresh, and reads it when the refresh body carries no token. Any other cookie use must keep the same attributes.
 - Passwords are hashed with bcrypt through `PasswordUtil`; login uses `verify_or_dummy` so an unknown username costs the same time as a wrong password.
 
 ## Redis keys

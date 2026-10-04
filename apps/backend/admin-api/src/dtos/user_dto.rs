@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use ru5ty_gate_types::{Permission, RoleName, get_permissions_for_role};
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -23,11 +24,16 @@ pub struct CurrentUserDto {
     pub last_seen: DateTime<Utc>,
     pub roles: NamedItem,
     pub status: NamedItem,
+    pub permissions: Vec<Permission>,
 }
 
 impl From<CurrentUserRecord> for CurrentUserDto {
     fn from(record: CurrentUserRecord) -> Self {
+        let permissions = RoleName::from_name(&record.role_name)
+            .map(get_permissions_for_role)
+            .unwrap_or_default();
         Self {
+            permissions,
             id: record.id,
             username: record.username,
             email: record.email,

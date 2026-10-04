@@ -1,12 +1,17 @@
 use axum::Json;
 use axum::extract::State;
-use axum::http::header::AUTHORIZATION;
-use axum::http::{HeaderMap, StatusCode};
+use axum::http::header::{AUTHORIZATION, SET_COOKIE};
+use axum::http::{HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
-use ru5ty_gate_http::{AppError, AuthUser, ClientIp, ValidatedJson};
+use ru5ty_gate_auth::refresh_ttl;
+use ru5ty_gate_http::{
+    AppError, AuthUser, ClientIp, ValidatedJson, clear_refresh_cookie_header,
+    refresh_cookie_header, refresh_token_from_cookies,
+};
 use ru5ty_gate_types::ApiResponse;
 use serde::Serialize;
 
+use crate::dtos::LoginData;
 use crate::schemas::{
     BootstrapAdminRequest, ForgotPasswordRequest, LoginRequest, RefreshTokenRequest,
     ResetPasswordRequest, VerifyLoginMfaRequest,
@@ -22,6 +27,25 @@ fn respond<T: Serialize>(
     (status, Json(body)).into_response()
 }
 
+fn with_cookie(mut response: Response, cookie: Option<HeaderValue>) -> Response {
+    if let Some(value) = cookie {
+        response.headers_mut().append(SET_COOKIE, value);
+    }
+    response
+}
+
+fn login_cookie(
+    body: &ApiResponse<LoginData>,
+    remember_me: bool,
+    secure: bool,
+) -> Option<HeaderValue> {
+    let token = body.data.as_ref().map(|data| data.refresh_token.as_str())?;
+    if token.is_empty() {
+        return None;
+    }
+    refresh_cookie_header(token, refresh_ttl(remember_me), secure)
+}
+
 fn bearer(headers: &HeaderMap) -> Option<&str> {
     headers
         .get(AUTHORIZATION)?
@@ -29,6 +53,19 @@ fn bearer(headers: &HeaderMap) -> Option<&str> {
         .ok()?
         .strip_prefix("Bearer ")
         .map(str::trim)
+}
+
+fn unauthorized_refresh(secure: bool) -> Response {
+    with_cookie(
+        (
+            StatusCode::UNAUTHORIZED,
+            Json(ApiResponse::<()>::failure(
+                "Invalid or expired refresh token",
+            )),
+        )
+            .into_response(),
+        clear_refresh_cookie_header(secure),
+    )
 }
 
 pub struct AuthController;
@@ -40,7 +77,11 @@ impl AuthController {
         ValidatedJson(body): ValidatedJson<LoginRequest>,
     ) -> Result<Response, AppError> {
         let result = state.services.auth.login(&body, &ip).await?;
-        Ok(respond(StatusCode::OK, StatusCode::UNAUTHORIZED, result))
+        let cookie = login_cookie(&result, body.remember_me, state.config.production);
+        Ok(with_cookie(
+            respond(StatusCode::OK, StatusCode::UNAUTHORIZED, result),
+            cookie,
+        ))
     }
 
     pub async fn verify_login_mfa(
@@ -49,29 +90,45 @@ impl AuthController {
         ValidatedJson(body): ValidatedJson<VerifyLoginMfaRequest>,
     ) -> Result<Response, AppError> {
         let result = state.services.auth.verify_login_mfa(&body, &ip).await?;
-        Ok(respond(StatusCode::OK, StatusCode::UNAUTHORIZED, result))
+        let cookie = login_cookie(&result, body.remember_me, state.config.production);
+        Ok(with_cookie(
+            respond(StatusCode::OK, StatusCode::UNAUTHORIZED, result),
+            cookie,
+        ))
     }
 
     pub async fn refresh(
         State(state): State<AppState>,
+        headers: HeaderMap,
         ValidatedJson(body): ValidatedJson<RefreshTokenRequest>,
     ) -> Result<Response, AppError> {
+        let secure = state.config.production;
+        let Some(token) = body
+            .refresh_token
+            .clone()
+            .filter(|value| !value.is_empty())
+            .or_else(|| refresh_token_from_cookies(&headers))
+        else {
+            return Ok(unauthorized_refresh(secure));
+        };
         match state
             .services
             .auth
-            .refresh_token(&body.refresh_token, body.remember_me)
+            .refresh_token(&token, body.remember_me)
             .await
         {
             Some(tokens) => {
-                Ok((StatusCode::OK, Json(ApiResponse::success(tokens))).into_response())
+                let cookie = refresh_cookie_header(
+                    &tokens.refresh_token,
+                    refresh_ttl(body.remember_me),
+                    secure,
+                );
+                Ok(with_cookie(
+                    (StatusCode::OK, Json(ApiResponse::success(tokens))).into_response(),
+                    cookie,
+                ))
             }
-            None => Ok((
-                StatusCode::UNAUTHORIZED,
-                Json(ApiResponse::<()>::failure(
-                    "Invalid or expired refresh token",
-                )),
-            )
-                .into_response()),
+            None => Ok(unauthorized_refresh(secure)),
         }
     }
 
@@ -85,7 +142,10 @@ impl AuthController {
             .auth
             .logout(user.id, bearer(&headers))
             .await?;
-        Ok((StatusCode::OK, Json(result)).into_response())
+        Ok(with_cookie(
+            (StatusCode::OK, Json(result)).into_response(),
+            clear_refresh_cookie_header(state.config.production),
+        ))
     }
 
     pub async fn forgot_password(

@@ -25,7 +25,7 @@ pub struct TokenService {
     redis: RedisService,
 }
 
-fn refresh_ttl(remember_me: bool) -> i64 {
+pub fn refresh_ttl(remember_me: bool) -> i64 {
     if remember_me {
         LONG_SESSION_TTL_SECONDS
     } else {
