@@ -6,7 +6,7 @@ members = ["common/*", "apps/backend/agent", "apps/backend/customer-api", "apps/
 version = "1.0.0"
 edition = "2024"
 rust-version = "1.97"
-license = "MIT"
+license = "LicenseRef-Zynkosi-Proprietary"
 publish = false
 
 [workspace.dependencies]

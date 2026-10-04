@@ -45,6 +45,6 @@ workspace = true
 [dev-dependencies]
 async-trait = "0.1.92"
 http-body-util = "0.1.5"
-ru5ty-gate-utilities = { path = "../../../common/utilities" }
+ru5ty-gate-utilities = { version = "1.0.0", path = "../../../common/utilities" }
 reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls"] }
 tower = { version = "0.5.3", features = ["util"] }

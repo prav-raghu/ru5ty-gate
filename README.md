@@ -144,3 +144,7 @@ The Postgres-backed services use `#[sqlx::test]` and need `DATABASE_URL`; see [d
 ## Documentation
 
 See [documentation/README.md](documentation/README.md) for the index. Conventions for contributors and for Claude Code live in [CLAUDE.md](CLAUDE.md) and `.claude/`.
+
+## License
+
+Proprietary. Copyright (c) 2025-2026 Zynkosi Tech (Pty) Ltd. See [LICENSE](LICENSE). Workspace crates declare `LicenseRef-Zynkosi-Proprietary` and are not published.

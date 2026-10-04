@@ -16,6 +16,9 @@ allow = [
 ]
 confidence-threshold = 0.9
 
+[licenses.private]
+ignore = true
+
 [bans]
 multiple-versions = "warn"
 wildcards = "deny"

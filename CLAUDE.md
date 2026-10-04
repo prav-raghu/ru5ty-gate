@@ -227,7 +227,7 @@ documentation/       markdown docs
 
 ## Project: Ru5ty Gate
 
-Captive portal platform. A Rust agent runs on the venue router (GL-iNet GL-MT6000, OpenWrt) behind openNDS as its Forwarding Authentication Service, and a central platform built from the standard services in this monorepo sits behind it. The structure comes from the Rust monorepo template; the namespace is `ru5ty-gate` / `ru5ty_gate`.
+Captive portal platform. A Rust agent runs on the venue router (GL-iNet GL-MT6000, OpenWrt) behind openNDS as its Forwarding Authentication Service, and a central platform built from the standard services in this monorepo sits behind it. The structure comes from the Rust monorepo template; the namespace is `ru5ty-gate` / `ru5ty_gate`. The code is proprietary to Zynkosi Tech (Pty) Ltd. (see `LICENSE`); workspace crates declare `LicenseRef-Zynkosi-Proprietary`.
 
 ### Agent and its crates
 
