@@ -47,11 +47,11 @@ ru5ty-gate-agent --config /etc/ru5ty-gate/agent.toml healthcheck && echo healthy
 
 ## Verify on the device
 
-Nothing in this directory has been run on real hardware. Check these on the first router:
+Nothing in this directory has been run on real hardware, and the CI cross-build job has not run on GitHub yet. Check these on the first router:
 
 - A client is redirected to the agent, gets a 302 back to `http://<router>/opennds_auth/?tok=...`, and gains internet access.
 - `curl http://127.0.0.1:2081/status` on the router shows the session and `"clock_trusted":true`.
 - Running `ndsctl deauth <mac>` makes the session disappear from `/status` and queues a `session_end` event.
 - A session that reaches its granted time is deauthenticated by the agent (`logread` shows no ndsctl errors).
 - The `users_to_router` rule is accepted by your openNDS version. Older releases name this ruleset differently.
-- The binary size fits in flash alongside the rest of the firmware.
+- The binary size fits in flash alongside the rest of the firmware. The x86_64 release build is about 10 MB, and the aarch64 musl build should be similar.
