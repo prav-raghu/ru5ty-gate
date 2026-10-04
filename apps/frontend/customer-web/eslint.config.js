@@ -18,6 +18,7 @@ export default defineConfig([
         "next-env.d.ts",
         "instrumentation.ts",
         "tailwind.config.ts",
+        "jest.config.ts",
         "sentry.client.config.ts",
         "sentry.edge.config.ts",
         "sentry.server.config.ts",
@@ -33,7 +34,7 @@ export default defineConfig([
             globals: globals.browser,
             parserOptions: {
                 tsconfigRootDir: __dirname,
-                project: ["./tsconfig.json"],
+                project: ["./tsconfig.json", "./tsconfig.test.json"],
             },
         },
         rules: {

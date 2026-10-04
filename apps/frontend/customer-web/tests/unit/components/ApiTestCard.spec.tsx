@@ -8,10 +8,15 @@ import userEvent from "@testing-library/user-event";
 import type { ApiTestCard as ApiTestCardType } from "@/components/ApiTestCard";
 import type { useApiStore as UseApiStoreType } from "@/store/use-api-store";
 
-const { ApiTestCard } = require("../../../app/components/ApiTestCard") as { ApiTestCard: typeof ApiTestCardType };
-const { useApiStore } = require("../../../app/store/use-api-store") as { useApiStore: typeof UseApiStoreType };
+let ApiTestCard: typeof ApiTestCardType;
+let useApiStore: typeof UseApiStoreType;
 
 describe("ApiTestCard", () => {
+    beforeAll(async () => {
+        ({ ApiTestCard } = await import("../../../app/components/ApiTestCard"));
+        ({ useApiStore } = await import("../../../app/store/use-api-store"));
+    });
+
     afterEach(() => {
         act(() => {
             useApiStore.getState().reset();

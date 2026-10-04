@@ -9,7 +9,7 @@ publish.workspace = true
 
 [dependencies]
 chrono = "0.4.45"
-jsonwebtoken = { version = "11.1.0", features = ["rust_crypto"] }
+jsonwebtoken = { version = "11.1.0", features = ["aws_lc_rs"] }
 ru5ty-gate-cache = { version = "1.0.0", path = "../cache" }
 ru5ty-gate-config = { version = "1.0.0", path = "../config" }
 ru5ty-gate-types = { version = "1.0.0", path = "../types" }

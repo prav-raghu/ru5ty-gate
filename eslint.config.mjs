@@ -26,6 +26,7 @@ export default tseslint.config(
             "apps/cms/config/**",
             "apps/cms/src/admin/**",
             "devops/scripts/**",
+            ".claude/skills/**",
         ],
     },
 

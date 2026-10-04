@@ -20,8 +20,8 @@ jest.mock("axios", () => ({
 import type { authTokenStore as AuthTokenStore } from "@/store/auth-token.store";
 import type { apiClient as ApiClient } from "@/services/api-client";
 
-const { authTokenStore } = require("../../../app/store/auth-token.store") as { authTokenStore: typeof AuthTokenStore };
-const { apiClient } = require("../../../app/services/api-client") as { apiClient: typeof ApiClient };
+let authTokenStore: typeof AuthTokenStore;
+let apiClient: typeof ApiClient;
 
 describe("apiClient", () => {
     let requestInterceptor: (config: never) => never;
@@ -29,7 +29,9 @@ describe("apiClient", () => {
     let responseSuccessInterceptor: (response: never) => never;
     let responseErrorInterceptor: (error: unknown) => Promise<unknown>;
 
-    beforeAll(() => {
+    beforeAll(async () => {
+        ({ authTokenStore } = await import("../../../app/store/auth-token.store"));
+        ({ apiClient } = await import("../../../app/services/api-client"));
         [requestInterceptor, requestErrorInterceptor] = mockAxiosInstance.interceptors.request.use.mock.calls[0];
         [responseSuccessInterceptor, responseErrorInterceptor] = mockAxiosInstance.interceptors.response.use.mock.calls[0];
     });

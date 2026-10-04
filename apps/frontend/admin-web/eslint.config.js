@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig([
-    globalIgnores(["dist", "tailwind.config.ts"]),
+    globalIgnores(["dist", "tailwind.config.ts", "jest.config.ts"]),
     {
         files: ["**/*.{ts,tsx}"],
         extends: [js.configs.recommended, tseslint.configs.recommended, reactRefresh.configs.vite],
@@ -23,7 +23,7 @@ export default defineConfig([
             globals: globals.browser,
             parserOptions: {
                 tsconfigRootDir: __dirname,
-                project: ["./tsconfig.app.json", "./tsconfig.node.json"],
+                project: ["./tsconfig.app.json", "./tsconfig.node.json", "./tsconfig.test.json"],
             },
         },
         rules: {
