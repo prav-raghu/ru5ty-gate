@@ -19,32 +19,41 @@ Severity scale: Critical (exploitable now, or the product does not work), High, 
 
 | Id | Title | Severity | Area | Done |
 |---|---|---|---|---|
-| SEC-01 | Agent does not speak any secure openNDS FAS level | Critical | agent | [ ] |
-| SEC-02 | Any LAN client can forge or overwrite session records | High | agent | [ ] |
-| SEC-03 | Open redirect through `authaction` | Medium | agent | [ ] |
-| SEC-04 | Unbounded input and unbounded sqlite growth | Medium | agent | [ ] |
-| SEC-05 | Zero or invalid config values panic tasks or force fail-open | Medium | agent | [ ] |
-| SEC-06 | Central API key can travel over plain HTTP and appears in `Debug` output | Medium | agent | [ ] |
-| SEC-07 | `/status` is reachable by captive clients | Low | agent | [ ] |
-| SEC-08 | MAC and IP addresses logged and synced without minimisation (POPIA) | Medium | agent | [ ] |
-| SEC-09 | Agent router has no timeout, concurrency or rate limit layers | Medium | agent | [ ] |
-| SEC-10 | Next.js and other JS dependencies with critical and high advisories | Critical | frontend | [ ] |
-| SEC-11 | `ClientIp` trusts the left-most `X-Forwarded-For` | High | platform | [ ] |
-| SEC-12 | Redis TLS certificate verification is off by default | Medium | platform | [ ] |
-| SEC-13 | Gateway `/metrics` is publicly routed without auth | Medium | platform | [ ] |
-| SEC-14 | GitHub Actions token permissions and action pinning | Medium | CI | [ ] |
-| SEC-15 | Security scan workflow is fully commented out | Medium | CI | [ ] |
-| FEAT-01 | Central platform endpoints for the agent | Critical | platform | [ ] |
-| FEAT-02 | Session end events and openNDS deauth ingestion | High | agent | [ ] |
-| FEAT-03 | Session duration is never enforced on the network | High | agent | [ ] |
-| FEAT-04 | Central policy and landing redirect are ignored | Medium | agent | [ ] |
-| FEAT-05 | Config validation for the agent | Medium | agent | [ ] |
-| FEAT-06 | OpenWrt build, packaging and service script | High | agent / CI | [ ] |
-| FEAT-07 | Router clock sanity before granting sessions | Medium | agent | [ ] |
-| FEAT-08 | Agent observability: queue depth, healthcheck subcommand | Low | agent | [ ] |
-| FEAT-09 | Admin dashboard for venues, gateways and sessions | Medium | frontend | [ ] |
-| FEAT-10 | Splash and consent page | Medium | frontend | [ ] |
-| FEAT-11 | End-to-end test against real openNDS request shapes | High | agent | [ ] |
+| SEC-01 | Agent does not speak any secure openNDS FAS level | Critical | agent | [x] |
+| SEC-02 | Any LAN client can forge or overwrite session records | High | agent | [x] |
+| SEC-03 | Open redirect through `authaction` | Medium | agent | [x] |
+| SEC-04 | Unbounded input and unbounded sqlite growth | Medium | agent | [x] |
+| SEC-05 | Zero or invalid config values panic tasks or force fail-open | Medium | agent | [x] |
+| SEC-06 | Central API key can travel over plain HTTP and appears in `Debug` output | Medium | agent | [x] |
+| SEC-07 | `/status` is reachable by captive clients | Low | agent | [x] |
+| SEC-08 | MAC and IP addresses logged and synced without minimisation (POPIA) | Medium | agent | [x] |
+| SEC-09 | Agent router has no timeout, concurrency or rate limit layers | Medium | agent | [x] |
+| SEC-10 | Next.js and other JS dependencies with critical and high advisories | Critical | frontend | [x] |
+| SEC-11 | `ClientIp` trusts the left-most `X-Forwarded-For` | High | platform | [x] |
+| SEC-12 | Redis TLS certificate verification is off by default | Medium | platform | [x] |
+| SEC-13 | Gateway `/metrics` is publicly routed without auth | Medium | platform | [x] |
+| SEC-14 | GitHub Actions token permissions and action pinning | Medium | CI | [x] |
+| SEC-15 | Security scan workflow is fully commented out | Medium | CI | [x] |
+| FEAT-01 | Central platform endpoints for the agent | Critical | platform | [x] |
+| FEAT-02 | Session end events and openNDS deauth ingestion | High | agent | [x] |
+| FEAT-03 | Session duration is never enforced on the network | High | agent | [x] |
+| FEAT-04 | Central policy and landing redirect are ignored | Medium | agent | [x] |
+| FEAT-05 | Config validation for the agent | Medium | agent | [x] |
+| FEAT-06 | OpenWrt build, packaging and service script | High | agent / CI | [x] |
+| FEAT-07 | Router clock sanity before granting sessions | Medium | agent | [x] |
+| FEAT-08 | Agent observability: queue depth, healthcheck subcommand | Low | agent | [x] |
+| FEAT-09 | Admin dashboard for venues, gateways and sessions | Medium | frontend | [x] |
+| FEAT-10 | Splash and consent page | Medium | frontend | [ ] (deferred) |
+| FEAT-11 | End-to-end test against real openNDS request shapes | High | agent | [x] |
+
+Implementation notes (2026-10-04):
+
+- Every item is implemented and committed except FEAT-10, which waits on the decisions listed under [Decisions needed from Prav](#decisions-needed-from-prav).
+- Not verified: the GitHub Actions workflows (SHA pins, the `agent-openwrt` cross-build job and the re-enabled `security-scan.yml`) have not run on GitHub, and the agent has not been run on a real GL-MT6000 with openNDS. The OpenWrt packaging files are untested on hardware.
+- SEC-10: two high advisories have no published fix and are ignored through `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml`. They are `node-forge` (through Expo tooling) and `braces` (through changesets). Both are build-time tooling and neither ships in a runtime bundle. Remove the entries once fixed versions exist.
+- SEC-01: only openNDS FAS level 1 is supported. Level 0 was dropped, so there is no `allow_insecure_level0` setting. Level 2 (AES) is not implemented.
+- FEAT-09: the admin-web access token lives in memory only (project rule), so a page reload requires signing in again. The role gating in the UI (Super Admin may write) is a hint only. The backend `venue:read` and `venue:write` permissions are the authority.
+- The template demo `Home` page and `CounterCard`, `ApiTestCard` and `TailwindShowcase` components are no longer routed. They are left in place.
 
 ## Method
 
@@ -475,6 +484,15 @@ Build fixtures from the openNDS reference scripts: level 1 base64 payloads with 
 8. FEAT-09, FEAT-10 (UI).
 
 ## Decisions needed from Prav
+
+Decisions taken while implementing (change them if you disagree):
+
+- Fail-open stays the default (`allow_offline = true`). The agent only grants a redirect token derived from the `faskey`, validates every field, and keeps `/status` and `/binauth` on a separate admin listener, so a captive client cannot reach them. Switch to fail-closed if you would rather deny everyone during an outage.
+- openNDS level 1 is the only supported level.
+- The central API lives in `admin-api`, with device authentication through per-gateway API keys.
+- The unused template services (`customer-api`, `schedule-api`, CMS, n8n) were kept.
+
+Still open:
 
 - Fail-open (`allow_offline = true`, the current default) or fail-closed when the central platform is down. Fail-open is friendlier, but combined with SEC-02 it grants everyone during an outage.
 - Which openNDS level to standardise on: 1 (simplest, recommended for a local FAS) or 2.
