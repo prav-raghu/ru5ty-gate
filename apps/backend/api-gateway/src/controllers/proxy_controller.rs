@@ -35,14 +35,7 @@ fn forwarded_headers(original: &HeaderMap, client_ip: &str) -> HeaderMap {
         }
         headers.append(name.clone(), value.clone());
     }
-    let chain = original
-        .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok())
-        .map_or_else(
-            || client_ip.to_owned(),
-            |existing| format!("{existing}, {client_ip}"),
-        );
-    if let Ok(value) = HeaderValue::from_str(&chain) {
+    if let Ok(value) = HeaderValue::from_str(client_ip) {
         headers.insert("x-forwarded-for", value);
     }
     if let Some(host) = original.get(HOST) {

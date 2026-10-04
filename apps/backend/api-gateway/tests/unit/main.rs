@@ -90,3 +90,31 @@ fn upstream_urls_follow_the_prefix_policy() {
     );
     assert_eq!(upstream_url(&admin, "/admin", None), "http://up:1/");
 }
+
+#[test]
+fn metrics_token_is_optional_but_must_be_long_enough() {
+    let with = |token: &'static str| {
+        let mut pairs = base();
+        pairs.push(("METRICS_TOKEN", token));
+        ServiceConfig::from_env(&EnvReader::from_pairs(pairs))
+    };
+
+    assert!(
+        ServiceConfig::from_env(&EnvReader::from_pairs(base()))
+            .unwrap()
+            .metrics_token
+            .is_none()
+    );
+    assert!(with("short").is_err());
+    assert_eq!(
+        with("0123456789abcdef").unwrap().metrics_token.as_deref(),
+        Some("0123456789abcdef")
+    );
+}
+
+#[test]
+fn trusted_proxy_hops_defaults_to_one() {
+    let config = ServiceConfig::from_env(&EnvReader::from_pairs(base())).unwrap();
+
+    assert_eq!(config.trusted_proxy_hops, 1);
+}

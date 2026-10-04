@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use axum::Router;
 use axum::middleware::{from_fn, from_fn_with_state};
+use axum::{Extension, Router};
 use ru5ty_gate_cache::RedisService;
 use ru5ty_gate_database::{DatabaseError, PgPool};
 use ru5ty_gate_email::{EmailSender, EmailService};
 use ru5ty_gate_http::{
-    RateLimiter, ServerInfo, api_version, catch_panic_layer, cors_layer, not_found, rate_limit,
-    request_logger, response_timestamp, security_headers, serve,
+    RateLimiter, ServerInfo, TrustedProxyHops, api_version, catch_panic_layer, cors_layer,
+    not_found, rate_limit, request_logger, response_timestamp, security_headers, serve,
 };
 use ru5ty_gate_utilities::CryptoError;
 use thiserror::Error;
@@ -65,6 +65,9 @@ impl Application {
     pub fn router(&self) -> Router {
         let global_limiter = RateLimiter::new(RateLimitConfig::global());
         let middleware = ServiceBuilder::new()
+            .layer(Extension(TrustedProxyHops(
+                self.state.config.trusted_proxy_hops,
+            )))
             .layer(catch_panic_layer())
             .layer(cors_layer(&self.state.config.cors_origin))
             .layer(from_fn(security_headers))

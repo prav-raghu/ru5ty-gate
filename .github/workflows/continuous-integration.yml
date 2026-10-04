@@ -9,6 +9,9 @@ on:
         branches: [main, develop]
     workflow_dispatch:
 
+permissions:
+    contents: read
+
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
@@ -27,15 +30,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
               with:
                   version: ${{ env.PNPM_VERSION }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: "pnpm"
@@ -49,15 +52,15 @@ jobs:
         needs: install
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
               with:
                   version: ${{ env.PNPM_VERSION }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: "pnpm"
@@ -66,7 +69,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Cache Rust build
-              uses: Swatinem/rust-cache@v2
+              uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
 
             - name: Check formatting
               run: pnpm format:check
@@ -75,7 +78,7 @@ jobs:
               run: pnpm lint
 
             - name: Audit Rust dependencies
-              uses: EmbarkStudios/cargo-deny-action@v2
+              uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2
 
     typecheck:
         name: Type Check
@@ -83,15 +86,15 @@ jobs:
         needs: install
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
               with:
                   version: ${{ env.PNPM_VERSION }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: "pnpm"
@@ -100,7 +103,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Cache Rust build
-              uses: Swatinem/rust-cache@v2
+              uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
 
             - name: Run TypeScript compiler and cargo check
               run: pnpm typecheck
@@ -116,15 +119,15 @@ jobs:
             NEXT_PUBLIC_CUSTOMER_APP_NAME: "CI Build"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
               with:
                   version: ${{ env.PNPM_VERSION }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: "pnpm"
@@ -133,7 +136,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Cache Rust build
-              uses: Swatinem/rust-cache@v2
+              uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
 
             - name: Build all packages
               run: pnpm build
@@ -142,7 +145,7 @@ jobs:
               run: cargo build --workspace --locked
 
             - name: Upload build artifacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
               with:
                   name: dist-artifacts
                   path: |
@@ -179,15 +182,15 @@ jobs:
                     --health-retries 10
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
               with:
                   version: ${{ env.PNPM_VERSION }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: ${{ env.NODE_VERSION }}
                   cache: "pnpm"
@@ -196,7 +199,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Cache Rust build
-              uses: Swatinem/rust-cache@v2
+              uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
 
             - name: Run tests with coverage
               run: pnpm test:coverage
@@ -205,7 +208,7 @@ jobs:
               run: pnpm test:rust
 
             - name: Upload coverage artifacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
               with:
                   name: coverage-reports
                   path: |
@@ -235,20 +238,23 @@ jobs:
         runs-on: ubuntu-latest
         needs: [build, test]
         if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'))
+        permissions:
+            contents: read
+            pull-requests: read
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
               with:
                   fetch-depth: 0
 
             - name: Download coverage artifacts
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
               with:
                   name: coverage-reports
                   path: .
 
             - name: SonarCloud Scan
-              uses: SonarSource/sonarcloud-github-action@master
+              uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5.0.0
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -258,7 +264,7 @@ jobs:
                       -Dsonar.organization=${{ vars.SONAR_ORGANIZATION || 'ru5ty-gate' }}
 
             - name: SonarQube Quality Gate check
-              uses: sonarsource/sonarqube-quality-gate-action@master
+              uses: sonarsource/sonarqube-quality-gate-action@7a5fffe8e523c40e0c740b6bc2712ab503e52efa # v1.2.1
               timeout-minutes: 5
               env:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -279,11 +285,11 @@ jobs:
             customer-web: ${{ steps.filter.outputs.customer-web }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Filter changed paths
               id: filter
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3
               with:
                   filters: |
                       shared: &shared
@@ -347,15 +353,15 @@ jobs:
         steps:
             - name: Checkout
               if: env.SHOULD_BUILD == 'true'
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
             - name: Set up Docker Buildx
               if: env.SHOULD_BUILD == 'true'
-              uses: docker/setup-buildx-action@v3
+              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
             - name: Log in to GHCR
               if: env.SHOULD_BUILD == 'true'
-              uses: docker/login-action@v3
+              uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
               with:
                   registry: ${{ env.REGISTRY }}
                   username: ${{ github.actor }}
@@ -373,7 +379,7 @@ jobs:
 
             - name: Build & push ${{ matrix.service }}
               if: env.SHOULD_BUILD == 'true'
-              uses: docker/build-push-action@v6
+              uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
               with:
                   context: .
                   file: ${{ matrix.dockerfile }}
@@ -396,6 +402,7 @@ jobs:
         runs-on: ubuntu-latest
         if: needs.docker-build.result == 'success'
         environment: production
+        permissions: {}
         concurrency:
             group: docker-deploy-${{ github.ref }}
             cancel-in-progress: false

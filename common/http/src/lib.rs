@@ -9,7 +9,9 @@ mod validation;
 
 pub use app_error::AppError;
 pub use cors::cors_layer;
-pub use extractors::{ApiPath, ApiQuery, ClientIp, ValidatedJson, parse_validated};
+pub use extractors::{
+    ApiPath, ApiQuery, ClientIp, TrustedProxyHops, ValidatedJson, parse_validated,
+};
 pub use fallback::{catch_panic_layer, not_found};
 pub use middleware::api_version::{ApiVersion, api_version};
 pub use middleware::auth::{AuthUser, Authenticator, authenticate, require_permission};

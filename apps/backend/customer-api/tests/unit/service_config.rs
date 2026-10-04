@@ -20,7 +20,7 @@ fn loads_a_complete_environment() {
     assert_eq!(config.port, 4002);
     assert!(!config.production);
     assert_eq!(config.database.max_connections, 10);
-    assert!(!config.redis_tls_reject_unauthorized);
+    assert!(config.redis_tls_reject_unauthorized);
 }
 
 #[test]
@@ -67,4 +67,39 @@ fn rejects_non_numeric_ports() {
     env.push(("PORT", "abc"));
 
     assert!(ServiceConfig::from_env(&EnvReader::from_pairs(env)).is_err());
+}
+
+#[test]
+fn redis_tls_verification_is_only_disabled_by_an_explicit_false() {
+    let verify = |value: Option<&'static str>| {
+        let mut pairs = base();
+        if let Some(value) = value {
+            pairs.push(("REDIS_TLS_REJECT_UNAUTHORIZED", value));
+        }
+        ServiceConfig::from_env(&EnvReader::from_pairs(pairs))
+            .unwrap()
+            .redis_tls_reject_unauthorized
+    };
+
+    assert!(verify(None));
+    assert!(verify(Some("true")));
+    assert!(verify(Some("anything")));
+    assert!(!verify(Some("false")));
+}
+
+#[test]
+fn trusted_proxy_hops_defaults_to_one_and_can_be_overridden() {
+    let hops = |value: Option<&'static str>| {
+        let mut pairs = base();
+        if let Some(value) = value {
+            pairs.push(("TRUSTED_PROXY_HOPS", value));
+        }
+        ServiceConfig::from_env(&EnvReader::from_pairs(pairs))
+            .unwrap()
+            .trusted_proxy_hops
+    };
+
+    assert_eq!(hops(None), 1);
+    assert_eq!(hops(Some("0")), 0);
+    assert_eq!(hops(Some("2")), 2);
 }

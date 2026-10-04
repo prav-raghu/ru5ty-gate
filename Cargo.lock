@@ -3686,6 +3686,7 @@ dependencies = [
  "ru5ty-gate-types",
  "serde",
  "serde_json",
+ "subtle",
  "thiserror",
  "tokio",
  "tower",

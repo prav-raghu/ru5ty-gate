@@ -20,6 +20,7 @@ pub struct ServiceConfig {
     pub port: u16,
     pub production: bool,
     pub cors_origin: String,
+    pub trusted_proxy_hops: usize,
     pub customer_web_url: String,
     pub redis_url: String,
     pub redis_tls_reject_unauthorized: bool,
@@ -42,11 +43,12 @@ impl ServiceConfig {
             port: env.parse_required("PORT")?,
             production,
             cors_origin: env.required("CORS_ORIGIN")?,
+            trusted_proxy_hops: env.parse_or("TRUSTED_PROXY_HOPS", 1_usize)?,
             customer_web_url: env.required("CUSTOMER_WEB_URL")?,
             redis_url: env.required("REDIS_URL")?,
             redis_tls_reject_unauthorized: env
                 .optional("REDIS_TLS_REJECT_UNAUTHORIZED")
-                .is_some_and(|value| value == "true"),
+                .is_none_or(|value| value != "false"),
             database: DatabaseConfig::from_env(env)?,
             auth: AuthConfig::from_env(env, TokenScope::Customer)?,
             email: EmailConfig::from_env(env)?,

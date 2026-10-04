@@ -129,3 +129,20 @@ pub async fn call(
 pub fn app_with(config: ServiceConfig) -> Router {
     Application::with_parts(config, None).router()
 }
+
+pub async fn call_from_peer(
+    app: &Router,
+    peer: &str,
+    uri: &str,
+    headers: &[(&str, &str)],
+) -> StatusCode {
+    let mut builder = Request::builder().method(Method::GET).uri(uri);
+    for (name, value) in headers {
+        builder = builder.header(*name, *value);
+    }
+    let mut request = builder.body(Body::empty()).unwrap();
+    request.extensions_mut().insert(axum::extract::ConnectInfo(
+        peer.parse::<std::net::SocketAddr>().unwrap(),
+    ));
+    app.clone().oneshot(request).await.unwrap().status()
+}

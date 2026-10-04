@@ -22,7 +22,7 @@ You are working on a Rust backend service built on Axum 0.8 and Tokio. These rul
 
 `catch_panic` → `cors` → `security_headers` → `rate_limit` → `request_logger` → `api_version` → (`response_timestamp` for admin-api and schedule-api)
 
-Layers are composed with `tower::ServiceBuilder` in `application.rs`, listed top to bottom in execution order. Routes register after the layers are defined: `Router::new().nest("/api/v1", V1Routes::register(&state))`.
+Layers are composed with `tower::ServiceBuilder` in `application.rs`, listed top to bottom in execution order. The first layer of every service sets the `TrustedProxyHops` extension from `TRUSTED_PROXY_HOPS` (default `1`), which `ClientIp` needs to pick the real client out of `X-Forwarded-For`; never read that header directly. Routes register after the layers are defined: `Router::new().nest("/api/v1", V1Routes::register(&state))`.
 
 ## Directory structure (immutable)
 

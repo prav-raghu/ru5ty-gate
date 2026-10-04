@@ -3,7 +3,7 @@
 use axum::http::{Method, StatusCode};
 use serde_json::json;
 
-use crate::common::{DEAD_UPSTREAM, app_with, call, config, start_upstream};
+use crate::common::{DEAD_UPSTREAM, app_with, call, call_from_peer, config, start_upstream};
 
 #[tokio::test]
 async fn customer_traffic_keeps_its_path_and_query() {
@@ -187,4 +187,22 @@ async fn cors_preflights_are_answered_for_the_configured_origin() {
         "http://localhost:3000"
     );
     assert_eq!(headers["access-control-allow-credentials"], "true");
+}
+
+#[tokio::test]
+async fn the_upstream_receives_only_the_client_resolved_behind_the_trusted_proxy() {
+    let (customer, customer_seen) = start_upstream("customer", StatusCode::OK).await;
+    let app = app_with(config(&customer, &customer, &customer, &[]));
+
+    let status = call_from_peer(
+        &app,
+        "10.0.0.2:4000",
+        "/api/v1/ping",
+        &[("x-forwarded-for", "6.6.6.6, 198.51.100.7")],
+    )
+    .await;
+
+    assert_eq!(status, StatusCode::OK);
+    let seen = customer_seen.seen.lock().unwrap();
+    assert_eq!(seen[0].headers["x-forwarded-for"], "198.51.100.7");
 }

@@ -1,16 +1,17 @@
 use std::sync::Arc;
 
-use axum::Router;
 use axum::middleware::{from_fn, from_fn_with_state};
+use axum::{Extension, Router};
 use ru5ty_gate_http::{
-    RateLimitPolicy, RateLimiter, ServerInfo, catch_panic_layer, cors_layer, not_found, rate_limit,
-    request_logger, security_headers, serve,
+    RateLimitPolicy, RateLimiter, ServerInfo, TrustedProxyHops, catch_panic_layer, cors_layer,
+    not_found, rate_limit, request_logger, security_headers, serve,
 };
 use ru5ty_gate_metrics::{MetricsError, MetricsRegistry, track_http};
 use thiserror::Error;
 use tower::ServiceBuilder;
 
 use crate::config::{ProxyConfig, ServiceConfig};
+use crate::guards::MetricsToken;
 use crate::plugins::graphql::graphql_router;
 use crate::plugins::health::{health_state, service_endpoints};
 use crate::plugins::metrics::install_metrics;
@@ -67,12 +68,17 @@ impl Application {
             router = router.merge(graphql);
         }
         if let Some(metrics) = &self.metrics {
-            router = router
-                .merge(MetricsRoutes::register(metrics.clone()))
-                .layer(from_fn_with_state(metrics.clone(), track_http));
+            if let Some(token) = &config.metrics_token {
+                router = router.merge(MetricsRoutes::register(
+                    metrics.clone(),
+                    MetricsToken::new(token),
+                ));
+            }
+            router = router.layer(from_fn_with_state(metrics.clone(), track_http));
         }
 
         let middleware = ServiceBuilder::new()
+            .layer(Extension(TrustedProxyHops(config.trusted_proxy_hops)))
             .layer(catch_panic_layer())
             .layer(cors_layer(&config.cors_origin))
             .layer(from_fn(security_headers))

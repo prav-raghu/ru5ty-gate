@@ -17,6 +17,11 @@ impl RedisService {
     }
 
     pub async fn connect(url: &str, reject_unauthorized: bool) -> Self {
+        if url.starts_with("rediss://") && !reject_unauthorized {
+            tracing::warn!(
+                "Redis TLS certificate verification is disabled; set REDIS_TLS_REJECT_UNAUTHORIZED=true outside trusted networks"
+            );
+        }
         let resolved = resolve_redis_url(url, reject_unauthorized);
         let manager = match redis::Client::open(resolved) {
             Ok(client) => match ConnectionManager::new(client).await {

@@ -21,10 +21,11 @@ services:
             PORT: "4001"
             DATABASE_URL: ${DATABASE_URL}
             REDIS_URL: ${REDIS_URL}
-            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-false}
+            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-true}
             JWT_SECRET: ${JWT_SECRET}
             JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
             CORS_ORIGIN: ${ADMIN_WEB_URL}
+            TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
             ADMIN_WEB_URL: ${ADMIN_WEB_URL}
             MAILTRAP_API_KEY: ${MAILTRAP_API_KEY}
             MAILTRAP_FROM: ${MAILTRAP_FROM}
@@ -57,10 +58,11 @@ services:
             PORT: "4002"
             DATABASE_URL: ${DATABASE_URL}
             REDIS_URL: ${REDIS_URL}
-            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-false}
+            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-true}
             JWT_SECRET: ${JWT_SECRET}
             JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
             CORS_ORIGIN: ${CUSTOMER_WEB_URL}
+            TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
             CUSTOMER_WEB_URL: ${CUSTOMER_WEB_URL}
             MAILTRAP_API_KEY: ${MAILTRAP_API_KEY}
             MAILTRAP_FROM: ${MAILTRAP_FROM}
@@ -90,10 +92,11 @@ services:
             PORT: "4003"
             DATABASE_URL: ${DATABASE_URL}
             REDIS_URL: ${REDIS_URL}
-            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-false}
+            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-true}
             SCHEDULE_API_KEY: ${SCHEDULE_API_KEY}
             SCHEDULE_WEBHOOK_INTERVAL_SECONDS: ${SCHEDULE_WEBHOOK_INTERVAL_SECONDS:-60}
             CORS_ORIGIN: ${CUSTOMER_WEB_URL}
+            TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
             SENTRY_DSN: ${SENTRY_DSN:-}
         depends_on:
             migrate:
@@ -118,10 +121,12 @@ services:
             APP_ENV: production
             PORT: "4000"
             CORS_ORIGIN: ${CUSTOMER_WEB_URL}
+            TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
             CUSTOMER_API_URL: http://customer-api:4002
             ADMIN_API_URL: http://admin-api:4001
             SCHEDULER_API_URL: http://schedule-api:4003
             RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-200}
+            METRICS_TOKEN: ${METRICS_TOKEN:-}
             SENTRY_DSN: ${SENTRY_DSN:-}
         depends_on:
             admin-api:

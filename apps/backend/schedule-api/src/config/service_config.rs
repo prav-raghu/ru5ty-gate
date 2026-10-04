@@ -23,6 +23,7 @@ pub struct ServiceConfig {
     pub port: u16,
     pub production: bool,
     pub cors_origin: String,
+    pub trusted_proxy_hops: usize,
     pub redis_url: String,
     pub redis_tls_reject_unauthorized: bool,
     pub schedule_api_key: String,
@@ -52,10 +53,11 @@ impl ServiceConfig {
             port: env.parse_required("PORT")?,
             production,
             cors_origin: env.required("CORS_ORIGIN")?,
+            trusted_proxy_hops: env.parse_or("TRUSTED_PROXY_HOPS", 1_usize)?,
             redis_url: env.required("REDIS_URL")?,
             redis_tls_reject_unauthorized: env
                 .optional("REDIS_TLS_REJECT_UNAUTHORIZED")
-                .is_some_and(|value| value == "true"),
+                .is_none_or(|value| value != "false"),
             schedule_api_key,
             webhook_interval: Duration::from_secs(interval_seconds),
             database: DatabaseConfig::from_env(env)?,

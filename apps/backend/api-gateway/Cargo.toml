@@ -37,6 +37,7 @@ thiserror.workspace = true
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync"] }
 tower = { version = "0.5.3", features = ["util"] }
 tracing = "0.1.44"
+subtle = "2.6.1"
 
 
 [lints]
