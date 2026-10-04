@@ -21,7 +21,7 @@ export function Button({ variant = "primary", loading = false, disabled, classNa
             disabled={disabled || loading}
             aria-busy={loading}
             className={cn(
-                "inline-flex min-h-9 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
+                "inline-flex min-h-11 md:min-h-9 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 "disabled:cursor-not-allowed disabled:opacity-60",
                 VARIANTS[variant],

@@ -107,7 +107,19 @@ describe("authService", () => {
     });
 
     it("maps the current user role", async () => {
-        mockApiClient.get.mockResolvedValue({ id: "u1", username: "admin", email: "a@b.com", roles: { name: "Super Admin" } });
-        await expect(authService.currentUser()).resolves.toEqual({ id: "u1", username: "admin", email: "a@b.com", role: "Super Admin" });
+        mockApiClient.get.mockResolvedValue({
+            id: "u1",
+            username: "admin",
+            email: "a@b.com",
+            roles: { name: "Super Admin" },
+            permissions: ["venue:read", "venue:write"],
+        });
+        await expect(authService.currentUser()).resolves.toEqual({
+            id: "u1",
+            username: "admin",
+            email: "a@b.com",
+            role: "Super Admin",
+            permissions: ["venue:read", "venue:write"],
+        });
     });
 });

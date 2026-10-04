@@ -27,8 +27,8 @@ const NEW_VENUE_DEFAULTS: VenueCreateForm = {
 };
 
 export function Venues() {
-    const role = useAuthStore((state) => state.user?.role);
-    const canManage = canManageVenues(role);
+    const permissions = useAuthStore((state) => state.user?.permissions);
+    const canManage = canManageVenues(permissions);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [creating, setCreating] = useState(false);
@@ -88,10 +88,18 @@ export function Venues() {
                     <table className="w-full text-left text-sm">
                         <thead className="text-muted-foreground">
                             <tr>
-                                <th className="px-4 py-3 font-medium">Name</th>
-                                <th className="px-4 py-3 font-medium">Code</th>
-                                <th className="px-4 py-3 font-medium">Session length</th>
-                                <th className="px-4 py-3 font-medium">New sessions</th>
+                                <th scope="col" className="px-4 py-3 font-medium">
+                                    Name
+                                </th>
+                                <th scope="col" className="px-4 py-3 font-medium">
+                                    Code
+                                </th>
+                                <th scope="col" className="px-4 py-3 font-medium">
+                                    Session length
+                                </th>
+                                <th scope="col" className="px-4 py-3 font-medium">
+                                    New sessions
+                                </th>
                             </tr>
                         </thead>
                         <tbody>

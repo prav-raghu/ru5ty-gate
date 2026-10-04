@@ -36,7 +36,12 @@ describe("ProtectedRoute", () => {
     });
 
     it("renders the protected content when the user is authenticated", () => {
-        useAuthStore.getState().setAuth({ id: "u1", username: "admin", email: "admin@test.com", role: "Super Admin" }, "token");
+        useAuthStore
+            .getState()
+            .setAuth(
+                { id: "u1", username: "admin", email: "admin@test.com", role: "Super Admin", permissions: ["venue:read", "venue:write"] },
+                "token",
+            );
 
         renderProtected();
 

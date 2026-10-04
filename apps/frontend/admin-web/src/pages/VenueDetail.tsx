@@ -89,8 +89,8 @@ function VenueSettings({ venue, canManage }: VenueSettingsProps) {
 
 export function VenueDetail() {
     const { venueId = "" } = useParams<{ venueId: string }>();
-    const role = useAuthStore((state) => state.user?.role);
-    const canManage = canManageVenues(role);
+    const permissions = useAuthStore((state) => state.user?.permissions);
+    const canManage = canManageVenues(permissions);
     const venue = useVenue(venueId);
 
     const crumbs = [{ label: "Venues", to: ROUTES.VENUES }, { label: venue.data?.name ?? "Venue" }];

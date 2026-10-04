@@ -1,12 +1,13 @@
 import { canManageVenues } from "../../../src/utils/permissions";
 
 describe("canManageVenues", () => {
-    it("allows Super Admin", () => {
-        expect(canManageVenues("Super Admin")).toBe(true);
+    it("allows users holding venue:write", () => {
+        expect(canManageVenues(["venue:read", "venue:write"])).toBe(true);
     });
 
-    it("denies other roles and a missing role", () => {
-        expect(canManageVenues("Viewer")).toBe(false);
+    it("denies read-only users, empty lists and a missing list", () => {
+        expect(canManageVenues(["venue:read"])).toBe(false);
+        expect(canManageVenues([])).toBe(false);
         expect(canManageVenues(undefined)).toBe(false);
     });
 });

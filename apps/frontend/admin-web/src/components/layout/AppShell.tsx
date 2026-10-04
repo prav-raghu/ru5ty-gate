@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { APP_NAME } from "../../constants/config";
 import { ROUTES } from "../../constants/routes";
+import { authService } from "../../services/auth.service";
 import { useAuthStore } from "../../store/auth.store";
+import { toast } from "../../store/toast.store";
 import { cn } from "../../utils/cn";
 import { Button } from "../ui/Button";
 import { Breadcrumbs, type Crumb } from "./Breadcrumbs";
@@ -19,7 +21,12 @@ export function AppShell({ breadcrumbs, children }: AppShellProps) {
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const navigate = useNavigate();
 
-    const signOut = (): void => {
+    const signOut = async (): Promise<void> => {
+        try {
+            await authService.logout();
+        } catch {
+            toast.error("Could not reach the server. You were signed out on this device only.");
+        }
         clearAuth();
         navigate(ROUTES.LOGIN);
     };
@@ -56,7 +63,7 @@ export function AppShell({ breadcrumbs, children }: AppShellProps) {
                                 {user.username} · {user.role}
                             </span>
                         ) : null}
-                        <Button variant="secondary" onClick={signOut}>
+                        <Button variant="secondary" onClick={() => void signOut()}>
                             Sign out
                         </Button>
                     </div>

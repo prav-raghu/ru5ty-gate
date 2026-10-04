@@ -14,6 +14,7 @@ interface CurrentUserResponse {
     username: string;
     email: string;
     roles: { name: string };
+    permissions: string[];
 }
 
 function loginData(envelope: ApiEnvelope<LoginData>): LoginData {
@@ -32,8 +33,11 @@ export const authService = {
             await apiClient.post<ApiEnvelope<LoginData>>("/api/v1/auth/verify-login-mfa", { mfaToken, code, rememberMe: false }),
         );
     },
+    async logout(): Promise<void> {
+        await apiClient.get<ApiEnvelope<null>>("/api/v1/auth/logout");
+    },
     async currentUser(): Promise<CurrentUser> {
         const user = await apiClient.get<CurrentUserResponse>("/api/v1/auth/me");
-        return { id: user.id, username: user.username, email: user.email, role: user.roles.name };
+        return { id: user.id, username: user.username, email: user.email, role: user.roles.name, permissions: user.permissions };
     },
 };

@@ -1,5 +1,5 @@
-const VENUE_WRITE_ROLES: readonly string[] = ["Super Admin"];
+export const VENUE_WRITE = "venue:write";
 
-export function canManageVenues(role: string | undefined): boolean {
-    return role !== undefined && VENUE_WRITE_ROLES.includes(role);
+export function canManageVenues(permissions: readonly string[] | undefined): boolean {
+    return permissions?.includes(VENUE_WRITE) ?? false;
 }

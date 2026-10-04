@@ -12,7 +12,13 @@ describe("useAuthStore", () => {
     });
 
     it("sets the authenticated state and stores the token", () => {
-        const user = { id: "u1", username: "alice", email: "alice@test.com", role: "Super Admin" };
+        const user = {
+            id: "u1",
+            username: "alice",
+            email: "alice@test.com",
+            role: "Super Admin",
+            permissions: ["venue:read", "venue:write"],
+        };
 
         useAuthStore.getState().setAuth(user, "access-token");
 
@@ -22,7 +28,13 @@ describe("useAuthStore", () => {
     });
 
     it("clears the authenticated state and the token", () => {
-        const user = { id: "u1", username: "alice", email: "alice@test.com", role: "Super Admin" };
+        const user = {
+            id: "u1",
+            username: "alice",
+            email: "alice@test.com",
+            role: "Super Admin",
+            permissions: ["venue:read", "venue:write"],
+        };
         useAuthStore.getState().setAuth(user, "access-token");
 
         useAuthStore.getState().clearAuth();

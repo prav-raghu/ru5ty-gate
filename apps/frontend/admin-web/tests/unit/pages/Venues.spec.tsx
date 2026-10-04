@@ -10,7 +10,8 @@ import { ok, venue } from "../../fixtures";
 import { renderWithProviders } from "../../render-with-providers";
 
 function signIn(role: string): void {
-    act(() => useAuthStore.getState().setAuth({ id: "u1", username: "admin", email: "admin@test.com", role }, "token"));
+    const permissions = role === "Super Admin" ? ["venue:read", "venue:write"] : ["venue:read"];
+    act(() => useAuthStore.getState().setAuth({ id: "u1", username: "admin", email: "admin@test.com", role, permissions }, "token"));
 }
 
 describe("Venues page", () => {
@@ -139,6 +140,38 @@ describe("Venues page", () => {
             expect(useToastStore.getState().toasts[0]).toMatchObject({ kind: "error", message: "Venue code already exists" }),
         );
         expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+
+    it("signs out through the API and returns to the login page", async () => {
+        signIn("Super Admin");
+        mockApiClient.get.mockImplementation(async (url: string) => (url === "/api/v1/auth/logout" ? ok(null) : ok([venue])));
+        const user = userEvent.setup();
+        renderWithProviders(<Venues />);
+        await screen.findByText("Cafe Durban");
+
+        await user.click(screen.getByRole("button", { name: "Sign out" }));
+
+        await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(false));
+        expect(mockApiClient.get).toHaveBeenCalledWith("/api/v1/auth/logout");
+        expect(useToastStore.getState().toasts).toEqual([]);
+    });
+
+    it("still signs out locally and says so when the server cannot be reached", async () => {
+        signIn("Super Admin");
+        mockApiClient.get.mockImplementation(async (url: string) => {
+            if (url === "/api/v1/auth/logout") {
+                throw new Error("offline");
+            }
+            return ok([venue]);
+        });
+        const user = userEvent.setup();
+        renderWithProviders(<Venues />);
+        await screen.findByText("Cafe Durban");
+
+        await user.click(screen.getByRole("button", { name: "Sign out" }));
+
+        await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(false));
+        expect(useToastStore.getState().toasts[0]).toMatchObject({ kind: "error" });
     });
 
     it("pages forward and back", async () => {

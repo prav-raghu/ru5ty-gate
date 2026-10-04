@@ -10,7 +10,8 @@ import { captiveSession, gateway, ok, venue } from "../../fixtures";
 import { renderWithProviders } from "../../render-with-providers";
 
 function signIn(role: string): void {
-    act(() => useAuthStore.getState().setAuth({ id: "u1", username: "admin", email: "admin@test.com", role }, "token"));
+    const permissions = role === "Super Admin" ? ["venue:read", "venue:write"] : ["venue:read"];
+    act(() => useAuthStore.getState().setAuth({ id: "u1", username: "admin", email: "admin@test.com", role, permissions }, "token"));
 }
 
 function route(): void {

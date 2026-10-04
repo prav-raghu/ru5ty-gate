@@ -56,13 +56,29 @@ export function GatewayList({ venueId, canManage }: GatewayListProps) {
                     <table className="w-full text-left text-sm">
                         <thead className="text-muted-foreground">
                             <tr>
-                                <th className="py-2 pr-4 font-medium">Name</th>
-                                <th className="py-2 pr-4 font-medium">Status</th>
-                                <th className="py-2 pr-4 font-medium">Last heartbeat</th>
-                                <th className="py-2 pr-4 font-medium">Agent</th>
-                                <th className="py-2 pr-4 font-medium">Sessions</th>
-                                <th className="py-2 pr-4 font-medium">Queued events</th>
-                                {canManage ? <th className="py-2 font-medium">Actions</th> : null}
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Name
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Status
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Last heartbeat
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Agent
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Sessions
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Queued events
+                                </th>
+                                {canManage ? (
+                                    <th scope="col" className="py-2 font-medium">
+                                        Actions
+                                    </th>
+                                ) : null}
                             </tr>
                         </thead>
                         <tbody>

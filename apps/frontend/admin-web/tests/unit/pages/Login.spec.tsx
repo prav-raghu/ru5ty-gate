@@ -16,7 +16,13 @@ import { useAuthStore } from "../../../src/store/auth.store";
 import { useToastStore } from "../../../src/store/toast.store";
 
 const loginSuccess = { isSuccessful: true, data: { authToken: "token-123", refreshToken: "r", username: "admin" } };
-const me = { id: "u1", username: "admin", email: "admin@test.com", roles: { name: "Super Admin" } };
+const me = {
+    id: "u1",
+    username: "admin",
+    email: "admin@test.com",
+    roles: { name: "Super Admin" },
+    permissions: ["venue:read", "venue:write"],
+};
 
 async function fillCredentials(email: string, password: string): Promise<void> {
     const user = userEvent.setup();

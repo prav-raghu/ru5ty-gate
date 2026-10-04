@@ -74,11 +74,21 @@ export function SessionsPanel({ venueId }: SessionsPanelProps) {
                     <table className="w-full text-left text-sm">
                         <thead className="text-muted-foreground">
                             <tr>
-                                <th className="py-2 pr-4 font-medium">Client</th>
-                                <th className="py-2 pr-4 font-medium">Gateway</th>
-                                <th className="py-2 pr-4 font-medium">Connected</th>
-                                <th className="py-2 pr-4 font-medium">Expires</th>
-                                <th className="py-2 font-medium">Ended</th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Client
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Gateway
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Connected
+                                </th>
+                                <th scope="col" className="py-2 pr-4 font-medium">
+                                    Expires
+                                </th>
+                                <th scope="col" className="py-2 font-medium">
+                                    Ended
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
