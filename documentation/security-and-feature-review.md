@@ -52,8 +52,9 @@ Implementation notes (2026-10-04):
 - Not verified: the GitHub Actions workflows (SHA pins, the `agent-openwrt` cross-build job and the re-enabled `security-scan.yml`) have not run on GitHub, and the agent has not been run on a real GL-MT6000 with openNDS. The OpenWrt packaging files are untested on hardware.
 - SEC-10: two high advisories have no published fix and are ignored through `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml`. They are `node-forge` (through Expo tooling) and `braces` (through changesets). Both are build-time tooling and neither ships in a runtime bundle. Remove the entries once fixed versions exist.
 - SEC-01: only openNDS FAS level 1 is supported. Level 0 was dropped, so there is no `allow_insecure_level0` setting. Level 2 (AES) is not implemented.
-- FEAT-09: the admin-web access token lives in memory only (project rule), so a page reload requires signing in again. The role gating in the UI (Super Admin may write) is a hint only. The backend `venue:read` and `venue:write` permissions are the authority.
-- The template demo `Home` page and `CounterCard`, `ApiTestCard` and `TailwindShowcase` components are no longer routed. They are left in place.
+- FEAT-09: the admin-web access token lives in memory only (project rule). `admin-api` sets the refresh token as an `HttpOnly`, `SameSite=Strict` cookie (`Secure` in production), so a page reload restores the session through `/auth/refresh`, a 401 triggers one silent refresh and retry, and sign out calls `/auth/logout`, which clears the cookie. The refresh token is still returned in the JSON body for non-browser clients.
+- FEAT-09: the UI hides write actions using the `permissions` list that `/auth/me` now returns. The backend `venue:read` and `venue:write` checks remain the authority.
+- FEAT-09: the template demo pages and components (`Home`, `About`, `CounterCard`, `ApiTestCard`, `TailwindShowcase` and their stores) were removed. The primary and destructive colour tokens were darkened to meet WCAG AA contrast.
 
 ## Method
 
