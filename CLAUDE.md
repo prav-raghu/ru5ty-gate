@@ -250,6 +250,10 @@ Every other rule applies unchanged, including strict clippy, no comments, one it
 
 The endpoints the agent calls (`/v1/venues/{venue_id}/sessions/validate`, `/policy`, `/heartbeat`, `/sync`) are documented in `common/central-client/README.md`. They are not implemented in `admin-api`, `customer-api` or `api-gateway` yet.
 
+### Open security findings and feature gaps
+
+`documentation/security-and-feature-review.md` is the work queue from the October 2026 review: security findings (`SEC-*`) and missing features (`FEAT-*`), each with location, evidence, fix and acceptance criteria, in a suggested order. Work through it one item per commit and tick its Status table as items merge.
+
 ### Region-specific defaults
 
 The template was built for a South Africa-based project and this project keeps those defaults: the phone validation regex `^(\+27|0)[6-8][0-9]{8}$` and SMSPortal for SMS. Hetzner EU (Falkenstein) in `vps-bootstrap.md` and `deployment-coolify.md` remains a starting point rather than a requirement.

@@ -12,6 +12,7 @@ This directory contains comprehensive documentation for the entire monorepo, inc
 
 - [Monorepo guide](./monorepo-guide.md) - Prerequisites, Postgres and Redis, environment files, running every app, testing and deployment
 - [Captive portal agent](../apps/backend/agent/README.md) - FAS protocol, configuration, running on a router
+- [Security and feature review](./security-and-feature-review.md) - Open security findings and missing features, written as a work queue
 
 ### Architecture and conventions
 
