@@ -6,7 +6,7 @@ Validates new sessions, pulls policy, posts heartbeats and syncs buffered sessio
 
 ## Public API
 
-CentralClient (new, validate_session, fetch_policy, post_heartbeat, sync_events), ClientConfig, ValidateSessionRequest, ValidateSessionResponse, PolicyResponse, HeartbeatRequest, SyncEventDto, SyncBatchRequest, SyncBatchResponse, CentralError
+CentralClient (new, validate_session, fetch_policy, post_heartbeat, sync_events), ClientConfig, IdentifierPolicy, ValidateSessionRequest, ValidateSessionResponse, PolicyResponse, HeartbeatRequest, SyncEventDto, SyncBatchRequest, SyncBatchResponse, CentralError
 
 Everything is re-exported from `src/lib.rs`; consumers never import internal module paths.
 
@@ -24,6 +24,12 @@ All paths are relative to `{base_url}/v1/venues/{venue_id}`:
 When `api_key` is configured it is sent as a bearer token on every request.
 
 ## Notes
+
+`ClientConfig::api_key` is a `SecretString`, so the key never shows up in `Debug` output.
+
+`IdentifierPolicy` decides what the central platform learns about clients. `raw()` passes MAC and IP addresses through. `hashed(pepper)` replaces them with salted SHA-256 hashes (`mac_hash`, `client_ip_hash` in event payloads) and `log_mac` gives a short hash or masked MAC that is safe to log; raw MACs are never logged.
+
+`HeartbeatRequest` carries `pending_events` and `last_sync_ok_at` so operators can see a stuck queue from the dashboard.
 
 `ClientConfig` is built by the agent from `ru5ty-gate-agent-config::Settings`. It stays separate here so this crate does not depend on the config crate.
 

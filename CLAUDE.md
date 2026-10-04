@@ -221,7 +221,7 @@ documentation/       markdown docs
 | cms (Strapi) | 4006 (`PORT`) | 4006 |
 | customer-mobile (Expo / Metro) | 4007 (`expo start --port 4007`) | not deployed as a container |
 | n8n | 4008 (host port of the dev compose, container listens on 5678) | per-project instance |
-| agent (captive portal) | 4009 (`bind_addr` in `apps/backend/agent/config/agent.toml`) | 2080 on the router, not a container |
+| agent (captive portal) | 4009 FAS, 4010 admin (`bind_addr` and `admin_bind_addr` in `apps/backend/agent/config/agent.toml`) | 2080 and 2081 on the router, not a container |
 
 `CORS_ORIGIN` accepts a comma-separated list of origins, for APIs called from more than one app (for example two web origins). Native mobile requests send no browser origin, so CORS does not apply to the Expo app.
 
@@ -232,8 +232,8 @@ Captive portal platform. A Rust agent runs on the venue router (GL-iNet GL-MT600
 ### Agent and its crates
 
 - `apps/backend/agent` is the router daemon (`ru5ty-gate-agent`, binary `ru5ty-gate-agent`). Its README holds the protocol, configuration and openNDS setup.
-- The pieces it wires together are shared crates under `common/`: `agent-config` (TOML settings), `session-store` (sqlite sessions and sync queue), `central-client` (central API HTTP client), `fas-server` (openNDS FAS routes) and `heartbeat` (heartbeat and sync tasks).
-- Local development uses `config/agent.example.toml` (port 4009, database under `apps/backend/agent/data/`). `config/agent.router.example.toml` holds the router settings (port 2080). `agent.toml` and `data/` are git-ignored.
+- The pieces it wires together are shared crates under `common/`: `agent-config` (TOML settings), `session-store` (sqlite sessions and sync queue), `central-client` (central API HTTP client), `fas-server` (openNDS FAS level 1 routes), `heartbeat` (heartbeat, sync and policy tasks) and `ndsctl` (local `ndsctl deauth` runner).
+- Local development uses `config/agent.example.toml` (ports 4009 and 4010, database under `apps/backend/agent/data/`; replace the `REPLACE_ME` secrets). `config/agent.router.example.toml` holds the router settings (port 2080). `agent.toml` and `data/` are git-ignored.
 
 ### Deliberate exceptions for the agent
 

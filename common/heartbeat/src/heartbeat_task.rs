@@ -1,24 +1,22 @@
-use std::time::{Duration, Instant};
-
 use ru5ty_gate_central_client::{CentralClient, HeartbeatRequest};
 use ru5ty_gate_session_store::{SessionStore, unix_now};
 use tokio::task::JoinHandle;
 
+use crate::{HeartbeatTaskConfig, SyncStatus};
+
 pub fn spawn_heartbeat_task(
     store: SessionStore,
     central: CentralClient,
-    venue_id: String,
-    agent_version: String,
-    interval: Duration,
-    process_start: Instant,
+    status: SyncStatus,
+    config: HeartbeatTaskConfig,
 ) -> JoinHandle<()> {
     tokio::spawn(async move {
-        let mut ticker = tokio::time::interval(interval);
+        let mut ticker = tokio::time::interval(config.interval);
         ticker.tick().await;
         loop {
             ticker.tick().await;
             let now = unix_now();
-            let uptime_secs = process_start.elapsed().as_secs();
+            let uptime_secs = config.process_start.elapsed().as_secs();
             let active_sessions = match store.active_session_count(now).await {
                 Ok(count) => count,
                 Err(err) => {
@@ -26,12 +24,15 @@ pub fn spawn_heartbeat_task(
                     -1
                 }
             };
+            let pending_events = store.pending_event_count().await.unwrap_or(-1);
 
             let heartbeat = HeartbeatRequest {
-                venue_id: venue_id.clone(),
+                venue_id: config.venue_id.clone(),
                 uptime_secs,
                 active_sessions,
-                agent_version: agent_version.clone(),
+                pending_events,
+                last_sync_ok_at: status.last_ok(),
+                agent_version: config.agent_version.clone(),
                 timestamp: now,
             };
 

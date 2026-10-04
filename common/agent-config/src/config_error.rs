@@ -12,4 +12,6 @@ pub enum ConfigError {
         #[source]
         source: toml::de::Error,
     },
+    #[error("invalid config value for {field}: {reason}")]
+    Invalid { field: &'static str, reason: String },
 }

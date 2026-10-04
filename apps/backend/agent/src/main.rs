@@ -1,7 +1,7 @@
 use std::process::ExitCode;
 
 use clap::Parser;
-use ru5ty_gate_agent::{Application, Cli};
+use ru5ty_gate_agent::{Application, Cli, Command, run_healthcheck};
 use ru5ty_gate_logging::init_logging;
 
 #[tokio::main]
@@ -19,6 +19,14 @@ async fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+
+    if let Some(Command::Healthcheck) = cli.command {
+        return if run_healthcheck(&settings.server.bind_addr).await {
+            ExitCode::SUCCESS
+        } else {
+            ExitCode::FAILURE
+        };
+    }
 
     let application = match Application::initialize(settings) {
         Ok(application) => application,

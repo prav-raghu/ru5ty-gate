@@ -79,7 +79,8 @@ ru5ty-gate/
 │   ├── agent-config/               # Agent TOML settings
 │   ├── central-client/             # HTTP client for the central platform API
 │   ├── fas-server/                 # openNDS FAS HTTP server
-│   ├── heartbeat/                  # Heartbeat and event sync tasks
+│   ├── heartbeat/                  # Heartbeat, event sync and policy tasks
+│   ├── ndsctl/                     # Local ndsctl deauth runner
 │   ├── session-store/              # sqlite session store and sync queue
 │   ├── auth/ cache/ config/ database/ email/ export/ http/ logging/
 │   └── metrics/ observability/ queue/ sms/ storage/ types/ utilities/ webhooks/
@@ -92,6 +93,7 @@ ru5ty-gate/
 
 ```bash
 cp apps/backend/agent/config/agent.example.toml apps/backend/agent/config/agent.toml
+# replace every REPLACE_ME with a secret (openssl rand -hex 32)
 pnpm dev:agent
 ```
 
@@ -101,7 +103,7 @@ Or without pnpm:
 cargo run -p ru5ty-gate-agent -- --config apps/backend/agent/config/agent.toml
 ```
 
-The agent listens on `127.0.0.1:4009` in development and keeps its session database under `apps/backend/agent/data/`. See [apps/backend/agent/README.md](apps/backend/agent/README.md) for the protocol, configuration and openNDS setup.
+The agent listens on `127.0.0.1:4009` (FAS) and `127.0.0.1:4010` (admin) in development and keeps its session database under `apps/backend/agent/data/`. See [apps/backend/agent/README.md](apps/backend/agent/README.md) for the protocol, configuration and openNDS setup.
 
 ## Quick start: the rest of the platform
 
@@ -122,7 +124,7 @@ Every app uses a fixed port in the 4000 range in local development:
 | cms | 4006 |
 | customer-mobile | 4007 |
 | n8n | 4008 |
-| agent | 4009 |
+| agent | 4009 (FAS), 4010 (admin) |
 
 ## Quality gates
 
@@ -136,7 +138,7 @@ Agent crates only:
 
 ```bash
 cargo test -p ru5ty-gate-agent-config -p ru5ty-gate-session-store -p ru5ty-gate-central-client \
-  -p ru5ty-gate-heartbeat -p ru5ty-gate-fas-server -p ru5ty-gate-agent
+  -p ru5ty-gate-heartbeat -p ru5ty-gate-fas-server -p ru5ty-gate-ndsctl -p ru5ty-gate-agent
 ```
 
 The Postgres-backed services use `#[sqlx::test]` and need `DATABASE_URL`; see [documentation/monorepo-guide.md](documentation/monorepo-guide.md).

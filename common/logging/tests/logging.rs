@@ -35,3 +35,23 @@ fn hashes_mapped_and_plain_ips_identically() {
     );
     assert_ne!(hash_ip("10.0.0.1", "a"), hash_ip("10.0.0.1", "b"));
 }
+
+#[test]
+fn hash_mac_is_case_insensitive_and_depends_on_the_pepper() {
+    let upper = ru5ty_gate_logging::hash_mac("AA:BB:CC:DD:EE:FF", "pepper");
+    let lower = ru5ty_gate_logging::hash_mac("aa:bb:cc:dd:ee:ff", "pepper");
+    let other = ru5ty_gate_logging::hash_mac("aa:bb:cc:dd:ee:ff", "different");
+
+    assert_eq!(upper, lower);
+    assert_ne!(lower, other);
+    assert_eq!(lower.len(), 64);
+}
+
+#[test]
+fn mask_mac_keeps_only_the_vendor_prefix() {
+    assert_eq!(
+        ru5ty_gate_logging::mask_mac("AA:BB:CC:DD:EE:FF"),
+        "aa:bb:cc:xx:xx:xx"
+    );
+    assert_eq!(ru5ty_gate_logging::mask_mac("garbage"), "xx:xx:xx:xx:xx:xx");
+}

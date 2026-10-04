@@ -1,15 +1,24 @@
 mod central_settings;
 mod config_error;
+mod enforcement_settings;
+mod fas_settings;
 mod heartbeat_settings;
+mod limits_settings;
+mod privacy_settings;
 mod server_settings;
 mod session_settings;
 mod settings;
+mod settings_validation;
 mod sync_settings;
 mod venue_settings;
 
 pub use central_settings::CentralSettings;
 pub use config_error::ConfigError;
+pub use enforcement_settings::EnforcementSettings;
+pub use fas_settings::FasSettings;
 pub use heartbeat_settings::HeartbeatSettings;
+pub use limits_settings::LimitsSettings;
+pub use privacy_settings::PrivacySettings;
 pub use server_settings::ServerSettings;
 pub use session_settings::SessionSettings;
 pub use settings::{CONFIG_PATH_ENV, DEFAULT_CONFIG_PATH, Settings};

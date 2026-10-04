@@ -9,6 +9,8 @@ publish.workspace = true
 
 [dependencies]
 reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls"] }
+ru5ty-gate-logging = { version = "1.0.0", path = "../logging" }
+secrecy = "0.10.3"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 thiserror.workspace = true

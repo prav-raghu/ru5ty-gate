@@ -22,4 +22,6 @@ pub enum AgentError {
     },
     #[error("FAS server error: {0}")]
     Serve(#[source] std::io::Error),
+    #[error("background task {task} stopped unexpectedly")]
+    TaskStopped { task: &'static str },
 }

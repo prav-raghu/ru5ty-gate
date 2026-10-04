@@ -1,13 +1,15 @@
 # ru5ty-gate agent configuration for local development.
 #
 # Copy this file to `agent.toml` in this directory (it is git-ignored) and
-# fill in the values for your venue and central platform. Use
-# agent.router.example.toml for the settings used on the router itself.
+# replace every REPLACE_ME value. The agent refuses to start while a secret
+# is shorter than 16 characters, so a copied file cannot run unchanged.
+# Generate secrets with: openssl rand -hex 32
+# Use agent.router.example.toml for the settings used on the router itself.
 # v1 is single-venue/single-gateway on purpose -- see apps/backend/agent/README.md
 # for what's explicitly out of scope.
 
 [venue]
-# Central-platform venue identifier.
+# Central-platform venue identifier (letters, digits, '-' and '_').
 id = "venue-demo-001"
 # Human-readable name, used only in logs.
 name = "Demo Cafe"
@@ -17,26 +19,38 @@ name = "Demo Cafe"
 gateway_name = "gl-mt6000"
 
 [server]
-# Address:port the FAS HTTP server binds to. Local development uses the
-# 4000 port range; on the router openNDS's FAS config points at 2080.
+# Public FAS listener. Local development uses the 4000 port range; on the
+# router openNDS's FAS config points at 2080.
 bind_addr = "127.0.0.1:4009"
+# Diagnostics listener (/status and /binauth). Keep it on loopback.
+admin_bind_addr = "127.0.0.1:4010"
 # Path to the local sqlite session-store database (git-ignored).
 db_path = "data/sessions.db"
 
+[fas]
+# Must match `option faskey` in /etc/config/opennds. openNDS returns
+# sha256(hid + faskey) as the authentication token, so this is the secret
+# that makes the agent the only way to authenticate a client.
+faskey = "REPLACE_ME"
+# Reject requests whose TCP peer is not the client they describe. Turn this
+# off only when a reverse proxy sits between openNDS and the agent.
+verify_client_ip = true
+
 [central]
-# Base URL of the central platform API.
-base_url = "https://central.example.com"
+# Base URL of the central platform API. Plain http is only accepted for
+# loopback addresses when an api_key is set.
+base_url = "http://127.0.0.1:8080"
 # Bearer token sent with every request. Leave unset for local/dev use
 # against a central API that doesn't require auth yet.
-# api_key = "changeme"
+# api_key = "REPLACE_ME"
 # Timeout (seconds) for calls to the central API. Kept short so an
 # unreachable central platform never stalls a client's captive-portal
 # auth -- the agent falls back to local policy instead.
 timeout_secs = 3
 
 [session]
-# Fallback session duration (seconds) used when the central platform
-# doesn't supply one, or is unreachable and allow_offline is true.
+# Fallback session duration (seconds) used when neither the central
+# platform nor its cached policy supplies one.
 default_duration_secs = 3600
 # Whether to grant access using local policy when the central platform
 # can't be reached at all ("fail open"). Set to false to fail closed
@@ -44,12 +58,36 @@ default_duration_secs = 3600
 allow_offline = true
 
 [heartbeat]
-# How often (seconds) to post a device health check-in to the central API.
+# How often (seconds) to post a device health check-in and refresh the
+# cached central policy.
 interval_secs = 60
 
 [sync]
 # How often (seconds) to attempt pushing buffered session events to the
 # central platform.
 interval_secs = 30
-# Max events to send per sync batch.
+# Max events to send per sync batch (1 to 1000).
 batch_size = 100
+# How long (seconds) synced events stay in the local database.
+retain_synced_secs = 86400
+# Upper bound on buffered events; the oldest are dropped beyond it.
+max_pending = 50000
+
+[privacy]
+# false (default): MAC and IP addresses are replaced by salted hashes in
+# everything sent to the central platform, and masked in logs.
+# true: raw identifiers are sent to the central platform.
+send_raw_identifiers = false
+# Secret salt for the hashes. Required while send_raw_identifiers is false.
+hash_pepper = "REPLACE_ME"
+
+[limits]
+request_timeout_secs = 10
+max_concurrent_requests = 64
+# Per client IP, on /fas only.
+fas_requests_per_minute = 30
+
+[enforcement]
+# Path to ndsctl. When set, the agent deauthenticates clients in openNDS
+# when their session expires. Leave unset on a development machine.
+# ndsctl_path = "/usr/bin/ndsctl"

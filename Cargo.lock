@@ -3638,13 +3638,17 @@ name = "ru5ty-gate-agent"
 version = "1.0.0"
 dependencies = [
  "axum",
+ "base64 0.23.1",
  "clap",
  "ru5ty-gate-agent-config",
  "ru5ty-gate-central-client",
  "ru5ty-gate-fas-server",
  "ru5ty-gate-heartbeat",
  "ru5ty-gate-logging",
+ "ru5ty-gate-ndsctl",
  "ru5ty-gate-session-store",
+ "secrecy",
+ "serde_json",
  "thiserror",
  "tokio",
  "tracing",
@@ -3654,6 +3658,7 @@ dependencies = [
 name = "ru5ty-gate-agent-config"
 version = "1.0.0"
 dependencies = [
+ "secrecy",
  "serde",
  "thiserror",
  "toml",
@@ -3721,6 +3726,8 @@ name = "ru5ty-gate-central-client"
 version = "1.0.0"
 dependencies = [
  "reqwest",
+ "ru5ty-gate-logging",
+ "secrecy",
  "serde",
  "serde_json",
  "thiserror",
@@ -3819,15 +3826,21 @@ name = "ru5ty-gate-fas-server"
 version = "1.0.0"
 dependencies = [
  "axum",
+ "base64 0.23.1",
+ "hex",
  "http-body-util",
  "ru5ty-gate-central-client",
  "ru5ty-gate-session-store",
+ "secrecy",
  "serde",
  "serde_json",
+ "sha2 0.11.0",
  "tokio",
  "tower",
+ "tower-http 0.7.1",
  "tracing",
  "urlencoding",
+ "validator",
 ]
 
 [[package]]
@@ -3837,6 +3850,7 @@ dependencies = [
  "axum",
  "ru5ty-gate-central-client",
  "ru5ty-gate-session-store",
+ "secrecy",
  "serde_json",
  "tokio",
  "tracing",
@@ -3895,6 +3909,15 @@ dependencies = [
  "thiserror",
  "tokio",
  "tower",
+]
+
+[[package]]
+name = "ru5ty-gate-ndsctl"
+version = "1.0.0"
+dependencies = [
+ "thiserror",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -4224,6 +4247,16 @@ dependencies = [
  "generic-array",
  "pkcs8",
  "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "secrecy"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e891af845473308773346dc847b2c23ee78fe442e0472ac50e22a18a93d3ae5a"
+dependencies = [
+ "serde",
  "zeroize",
 ]
 
@@ -4901,7 +4934,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
@@ -5138,6 +5171,7 @@ dependencies = [
  "pin-project-lite",
  "sync_wrapper",
  "tokio",
+ "tokio-util",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -5175,6 +5209,7 @@ dependencies = [
  "http-body-util",
  "percent-encoding",
  "pin-project-lite",
+ "tokio",
  "tower-layer",
  "tower-service",
  "tracing",

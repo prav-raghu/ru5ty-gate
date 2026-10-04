@@ -1,3 +1,4 @@
+use secrecy::ExposeSecret;
 use serde::de::DeserializeOwned;
 
 use crate::{
@@ -31,7 +32,7 @@ impl CentralClient {
 
     fn authed(&self, builder: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
         match &self.config.api_key {
-            Some(key) => builder.bearer_auth(key),
+            Some(key) => builder.bearer_auth(key.expose_secret()),
             None => builder,
         }
     }

@@ -1,31 +1,35 @@
 # ru5ty-gate-fas-server
 
-Forwarding Authentication Service (FAS) HTTP server for openNDS.
+Forwarding Authentication Service (FAS) HTTP server for openNDS, speaking `fas_secure_enabled '1'`.
 
-openNDS intercepts an unauthenticated client and redirects the browser to this server with the client and gateway described in the query string. The server decides grant or deny, consulting the central platform and falling back to local policy if it is unreachable. On grant it redirects the browser back to openNDS's own auth endpoint, which installs the firewall rule that lets the client's traffic through.
+openNDS intercepts an unauthenticated client and redirects the browser here with one base64 `fas` value describing the client and gateway. The server validates it, decides grant or deny (consulting the central platform and falling back to local policy), and on grant redirects the browser to openNDS's auth endpoint with the token `sha256_hex(hid + faskey)`.
 
 Reference: [openNDS FAS documentation](https://opennds.readthedocs.io/en/latest/fas.html).
 
 ## Public API
 
-router, AppState, FasConfig, FasQuery
+public_router, admin_router, AppState, FasConfig, RouterLimits, RateLimiter, FasRequest, FasPayload, FasPayloadDecoder, FasToken, FasError
 
 Everything is re-exported from `src/lib.rs`; consumers never import internal module paths.
 
 ## Routes
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/fas` | openNDS auth callout |
-| GET | `/health` | Liveness probe for the agent process |
-| GET | `/status` | Active session count and number of sync events still buffered |
+| Router | Method | Path | Purpose |
+|---|---|---|---|
+| public | GET | `/fas` | openNDS auth callout |
+| public | GET | `/health` | liveness probe |
+| admin | GET | `/status` | active sessions, queue depth, clock trust |
+| admin | POST | `/binauth` | openNDS BinAuth deauthentication report |
+
+Serve the public router with `into_make_service_with_connect_info::<SocketAddr>()` so the peer check can see the client's address, and bind the admin router to loopback only.
 
 ## Notes
 
-- `FasQuery` carries the parameters openNDS appends. `authaction`, `gatewaymac` and `clientif` are optional because they depend on the `fas_secure_enabled` level and the gateway interface setup.
-- `hid` is openNDS's per-attempt token. It must be echoed back verbatim as `tok` so openNDS can match the callback to the client it is holding captive.
-- `FasQuery::auth_redirect_url` prefers the `authaction` URL when openNDS supplies one, and otherwise builds `http://<gatewayaddress>:<gatewayport>/opennds_auth/`.
-- `FasConfig` is the subset of agent settings this crate needs. The agent maps `Settings` into it, so this crate does not depend on the config crate.
+- `FasPayloadDecoder` splits the decoded value on `", "` and each pair on the first `=`, keeps the first occurrence of a repeated field, and restores `+` characters that arrived as spaces. Fields are checked with `validator` rules; an `originurl` that is not an http(s) URL is dropped rather than rejected.
+- Only level 1 is supported. A request without a `fas` value, such as the old flat level 0 query, gets `400`.
+- `FasConfig::verify_client_ip` requires the TCP peer to equal the payload's `clientip`. Disable it only behind a reverse proxy.
+- The public router adds a request timeout, a concurrency limit, a panic catcher, `Cache-Control: no-store` and a per-client-IP rate limit on `/fas` (`RouterLimits`).
+- `IdentifierPolicy` (from `ru5ty-gate-central-client`) decides whether the central platform receives raw or hashed MAC and IP addresses, and keeps raw MACs out of log lines.
 - When `FasConfig::gateway_name` is set, requests carrying a different `gatewayname` get a 400. v1 is single-gateway by design.
 - Offline tolerance: an outage on the central-platform side is never itself the reason a client is denied, unless the operator explicitly sets `allow_offline = false`.
 
@@ -36,7 +40,7 @@ ru5ty-gate-fas-server = { version = "1.0.0", path = "../../../common/fas-server"
 ```
 
 ```rust
-use ru5ty_gate_fas_server::router;
+use ru5ty_gate_fas_server::public_router;
 ```
 
 ## Test

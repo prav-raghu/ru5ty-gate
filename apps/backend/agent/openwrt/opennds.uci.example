@@ -1,0 +1,27 @@
+# openNDS settings for a router running ru5ty-gate-agent.
+#
+# Merge these options into the config opennds section in /etc/config/opennds,
+# then run: service opennds restart
+#
+# 192.168.1.1 stands for the router's LAN address, the one clients reach.
+# fasremoteip must be that address and not 127.0.0.1, because it is the
+# client's browser that gets redirected to the agent.
+
+config opennds
+	option fasport '2080'
+	option fasremoteip '192.168.1.1'
+	option faspath '/fas'
+
+	# Level 1: openNDS sends one base64 "fas" value and expects
+	# sha256(hid + faskey) back. Use the same faskey as in agent.toml and
+	# generate it with: openssl rand -hex 32
+	option fas_secure_enabled '1'
+	option faskey 'REPLACE_WITH_THE_FASKEY_FROM_AGENT_TOML'
+
+	# The agent can shorten a session (it deauthenticates the client when the
+	# granted time is up) but cannot extend one beyond this value, so set it
+	# to at least the longest session the central platform will grant.
+	option sessiontimeout '1440'
+
+	# Let captive clients reach the agent before they are authenticated.
+	list users_to_router 'allow tcp port 2080'
