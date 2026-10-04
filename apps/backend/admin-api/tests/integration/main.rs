@@ -2,6 +2,7 @@
 
 #[path = "../common/mod.rs"]
 mod common;
+mod device_api;
 
 use axum::body::Body;
 use axum::http::{Method, Request, StatusCode};

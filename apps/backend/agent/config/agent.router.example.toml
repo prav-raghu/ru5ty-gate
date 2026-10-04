@@ -37,10 +37,11 @@ faskey = "REPLACE_ME"
 verify_client_ip = true
 
 [central]
-# Base URL of the central platform API. https is required when an api_key
-# is set.
-base_url = "https://central.example.com"
-# Bearer token sent with every request (generated per gateway).
+# Base URL of the central platform API, up to but excluding /v1. Through the
+# API gateway the admin API lives under /admin, so this is the gateway
+# address plus /admin/api. https is required when an api_key is set.
+base_url = "https://central.example.com/admin/api"
+# Gateway API key, shown once when the gateway is created in the admin API.
 api_key = "REPLACE_ME"
 # Timeout (seconds) for calls to the central API. Kept short so an
 # unreachable central platform never stalls a client's captive-portal

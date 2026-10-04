@@ -1,9 +1,21 @@
+mod heartbeat_record;
+mod new_captive_session;
+mod new_gateway;
+mod new_venue;
 mod new_webhook_subscription;
 mod page_request;
+mod session_list_filter;
 mod user_list_filter;
+mod venue_changes;
 mod webhook_subscription_changes;
 
+pub use heartbeat_record::HeartbeatRecord;
+pub use new_captive_session::NewCaptiveSession;
+pub use new_gateway::NewGateway;
+pub use new_venue::NewVenue;
 pub use new_webhook_subscription::NewWebhookSubscription;
 pub use page_request::PageRequest;
+pub use session_list_filter::SessionListFilter;
 pub use user_list_filter::UserListFilter;
+pub use venue_changes::VenueChanges;
 pub use webhook_subscription_changes::WebhookSubscriptionChanges;

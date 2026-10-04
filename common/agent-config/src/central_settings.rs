@@ -15,7 +15,7 @@ pub struct CentralSettings {
 
 impl CentralSettings {
     fn default_base_url() -> String {
-        "http://127.0.0.1:8080".to_owned()
+        "http://127.0.0.1:4001/api".to_owned()
     }
 
     fn default_timeout_secs() -> u64 {

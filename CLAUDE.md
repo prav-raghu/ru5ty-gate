@@ -248,7 +248,7 @@ Every other rule applies unchanged, including strict clippy, no comments, one it
 
 ### Central platform
 
-The endpoints the agent calls (`/v1/venues/{venue_id}/sessions/validate`, `/policy`, `/heartbeat`, `/sync`) are documented in `common/central-client/README.md`. They are not implemented in `admin-api`, `customer-api` or `api-gateway` yet.
+The endpoints the agent calls (`/v1/venues/{venue_id}/sessions/validate`, `/policy`, `/heartbeat`, `/sync`) are documented in `common/central-client/README.md` and implemented in `admin-api` (venues, gateways and captive sessions, with `venue:read` and `venue:write` permissions). Device requests authenticate with a per-gateway API key rather than a JWT, and their bodies are bare snake_case JSON, a deliberate exception to the response envelope rule.
 
 ### Open security findings and feature gaps
 

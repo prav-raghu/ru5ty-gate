@@ -39,7 +39,7 @@ verify_client_ip = true
 [central]
 # Base URL of the central platform API. Plain http is only accepted for
 # loopback addresses when an api_key is set.
-base_url = "http://127.0.0.1:8080"
+base_url = "http://127.0.0.1:4001/api"
 # Bearer token sent with every request. Leave unset for local/dev use
 # against a central API that doesn't require auth yet.
 # api_key = "REPLACE_ME"

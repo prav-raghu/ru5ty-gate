@@ -22,6 +22,7 @@ base64 = "0.23.1"
 chrono = "0.4.45"
 dotenvy = "0.15.7"
 futures-util = "0.3.34"
+hex = "0.4.3"
 ru5ty-gate-auth = { version = "1.0.0", path = "../../../common/auth" }
 ru5ty-gate-cache = { version = "1.0.0", path = "../../../common/cache" }
 ru5ty-gate-config = { version = "1.0.0", path = "../../../common/config" }
@@ -35,7 +36,9 @@ ru5ty-gate-types = { version = "1.0.0", path = "../../../common/types" }
 ru5ty-gate-utilities = { version = "1.0.0", path = "../../../common/utilities" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+sha2 = "0.11.0"
 sqlx = { version = "0.9.0", default-features = false, features = ["postgres", "uuid", "chrono", "json", "derive"] }
+subtle = "2.6.1"
 thiserror.workspace = true
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync"] }
 totp-rs = { version = "6.0.0", features = ["qr", "otpauth", "gen_secret"] }
@@ -51,5 +54,7 @@ workspace = true
 
 [dev-dependencies]
 async-trait = "0.1.92"
+ru5ty-gate-central-client = { version = "1.0.0", path = "../../../common/central-client" }
+secrecy = "0.10.3"
 http-body-util = "0.1.5"
 tower = { version = "0.5.3", features = ["util"] }

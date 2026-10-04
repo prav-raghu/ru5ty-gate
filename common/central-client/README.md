@@ -12,7 +12,7 @@ Everything is re-exported from `src/lib.rs`; consumers never import internal mod
 
 ## Endpoints
 
-All paths are relative to `{base_url}/v1/venues/{venue_id}`:
+All paths are relative to `{base_url}/v1/venues/{venue_id}`, where `venue_id` is the venue `code` configured in the agent. The central platform implements them in `admin-api` (see its README), so `base_url` is the admin API address plus `/api`, for example `https://central.example.com/admin/api` when going through the gateway:
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -21,7 +21,9 @@ All paths are relative to `{base_url}/v1/venues/{venue_id}`:
 | POST | `/heartbeat` | Device health check-in |
 | POST | `/sync` | Push a batch of buffered session events |
 
-When `api_key` is configured it is sent as a bearer token on every request.
+When `api_key` is configured it is sent as a bearer token on every request. Gateways receive their key from the admin API in the form `<gatewayId>.<secret>`; a key only works for its own venue.
+
+Bodies and responses are bare snake_case JSON without the `{ isSuccessful, data }` envelope the rest of the platform uses, and request bodies reject unknown fields. Change the DTOs here and in `admin-api`'s `device_schema.rs` together. `heartbeat` answers `204`.
 
 ## Notes
 

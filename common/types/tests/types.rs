@@ -62,3 +62,43 @@ fn envelope_serialises_with_camel_case_and_skips_empty_fields() {
     assert_eq!(body["errors"][0]["field"], "email");
     assert!(body.get("data").is_none());
 }
+
+#[test]
+fn only_super_admins_can_manage_venues_while_support_and_moderators_can_view_them() {
+    assert!(role_has_permission(
+        RoleName::SuperAdmin,
+        Permission::VenueWrite
+    ));
+    assert!(!role_has_permission(
+        RoleName::Moderator,
+        Permission::VenueWrite
+    ));
+    assert!(!role_has_permission(
+        RoleName::Support,
+        Permission::VenueWrite
+    ));
+    assert!(role_has_permission(
+        RoleName::Moderator,
+        Permission::VenueRead
+    ));
+    assert!(role_has_permission(
+        RoleName::Support,
+        Permission::VenueRead
+    ));
+    assert!(!role_has_permission(
+        RoleName::ChatUser,
+        Permission::VenueRead
+    ));
+}
+
+#[test]
+fn venue_permissions_serialise_to_wire_values() {
+    assert_eq!(
+        serde_json::to_string(&Permission::VenueRead).unwrap(),
+        "\"venue:read\""
+    );
+    assert_eq!(
+        serde_json::to_string(&Permission::VenueWrite).unwrap(),
+        "\"venue:write\""
+    );
+}

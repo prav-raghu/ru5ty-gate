@@ -230,3 +230,14 @@ pub async fn login_token(app: &Router, email: &str) -> String {
     assert_eq!(status, StatusCode::OK, "{body}");
     body["data"]["authToken"].as_str().unwrap().to_owned()
 }
+
+pub fn actor(name: &str) -> ru5ty_gate_http::AuthUser {
+    ru5ty_gate_http::AuthUser {
+        id: Uuid::new_v4(),
+        username: name.to_owned(),
+        email: None,
+        role: "Super Admin".to_owned(),
+        permissions: ru5ty_gate_types::Permission::ALL.to_vec(),
+        scope: ru5ty_gate_types::TokenScope::Admin,
+    }
+}

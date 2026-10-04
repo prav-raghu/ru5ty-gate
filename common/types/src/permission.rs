@@ -22,10 +22,14 @@ pub enum Permission {
     SettingsWrite,
     #[serde(rename = "batch:write")]
     BatchWrite,
+    #[serde(rename = "venue:read")]
+    VenueRead,
+    #[serde(rename = "venue:write")]
+    VenueWrite,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 10] = [
+    pub const ALL: [Permission; 12] = [
         Self::UserRead,
         Self::UserWrite,
         Self::UserDelete,
@@ -36,6 +40,8 @@ impl Permission {
         Self::SettingsRead,
         Self::SettingsWrite,
         Self::BatchWrite,
+        Self::VenueRead,
+        Self::VenueWrite,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -50,6 +56,8 @@ impl Permission {
             Self::SettingsRead => "settings:read",
             Self::SettingsWrite => "settings:write",
             Self::BatchWrite => "batch:write",
+            Self::VenueRead => "venue:read",
+            Self::VenueWrite => "venue:write",
         }
     }
 }

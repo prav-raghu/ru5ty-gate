@@ -8,7 +8,8 @@ use ru5ty_gate_utilities::CryptoUtil;
 
 use crate::config::ServiceConfig;
 use crate::services::{
-    AuthService, BatchOperationService, BootstrapService, ReportingService, UserService,
+    AuthService, BatchOperationService, BootstrapService, CaptiveSessionService, GatewayService,
+    ReportingService, UserService, VenueService,
 };
 use crate::types::Services;
 
@@ -42,5 +43,8 @@ pub fn build_services(
         batch: BatchOperationService::new(pool.clone()),
         reporting: ReportingService::new(pool.clone()),
         bootstrap: BootstrapService::new(pool.clone(), config.admin_bootstrap_enabled),
+        venue: VenueService::new(pool.clone()),
+        gateway: GatewayService::new(pool.clone()),
+        captive_session: CaptiveSessionService::new(pool.clone()),
     })
 }

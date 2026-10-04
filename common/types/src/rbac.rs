@@ -11,11 +11,13 @@ pub fn get_permissions_for_role(role: RoleName) -> Vec<Permission> {
             Permission::ReportView,
             Permission::ReportExport,
             Permission::BatchWrite,
+            Permission::VenueRead,
         ],
         RoleName::Support => vec![
             Permission::UserRead,
             Permission::RoleRead,
             Permission::ReportView,
+            Permission::VenueRead,
         ],
         RoleName::ChatUser => vec![Permission::UserRead],
     }
