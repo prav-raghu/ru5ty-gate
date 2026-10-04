@@ -1,0 +1,24 @@
+[package]
+name = "ru5ty-gate-auth"
+description = "JWT token service with rotation, blacklist and per-user session invalidation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+chrono = "0.4.45"
+jsonwebtoken = { version = "11.1.0", features = ["rust_crypto"] }
+ru5ty-gate-cache = { version = "1.0.0", path = "../cache" }
+ru5ty-gate-config = { version = "1.0.0", path = "../config" }
+ru5ty-gate-types = { version = "1.0.0", path = "../types" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror.workspace = true
+tokio = { version = "1.53.1", features = ["macros", "rt"] }
+tracing = "0.1.44"
+uuid = { version = "1.26.1", features = ["v4", "serde"] }
+
+[lints]
+workspace = true

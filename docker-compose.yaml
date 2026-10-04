@@ -1,0 +1,174 @@
+services:
+    migrate:
+        image: ghcr.io/ru5ty-gate/admin-api:main
+        pull_policy: always
+        container_name: migrate
+        command: ["migrate"]
+        environment:
+            DATABASE_URL: ${DATABASE_URL}
+        restart: "no"
+        networks:
+            - app-network
+            - coolify
+
+    admin-api:
+        image: ghcr.io/ru5ty-gate/admin-api:main
+        pull_policy: always
+        expose:
+            - "4001"
+        environment:
+            APP_ENV: production
+            PORT: "4001"
+            DATABASE_URL: ${DATABASE_URL}
+            REDIS_URL: ${REDIS_URL}
+            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-false}
+            JWT_SECRET: ${JWT_SECRET}
+            JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+            CORS_ORIGIN: ${ADMIN_WEB_URL}
+            ADMIN_WEB_URL: ${ADMIN_WEB_URL}
+            MAILTRAP_API_KEY: ${MAILTRAP_API_KEY}
+            MAILTRAP_FROM: ${MAILTRAP_FROM}
+            MAILTRAP_FROM_NAME: ${MAILTRAP_FROM_NAME}
+            PASSWORD_RESET_EXPIRATION_MINUTES: ${PASSWORD_RESET_EXPIRATION_MINUTES:-30}
+            TWO_FACTOR_ENCRYPTION_KEY: ${TWO_FACTOR_ENCRYPTION_KEY}
+            ADMIN_BOOTSTRAP_ENABLED: ${ADMIN_BOOTSTRAP_ENABLED:-false}
+            SENTRY_DSN: ${SENTRY_DSN:-}
+        depends_on:
+            migrate:
+                condition: service_completed_successfully
+        healthcheck:
+            test: ["CMD", "/usr/local/bin/admin-api", "healthcheck"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        restart: unless-stopped
+        networks:
+            - app-network
+            - coolify
+
+    customer-api:
+        image: ghcr.io/ru5ty-gate/customer-api:main
+        pull_policy: always
+        expose:
+            - "4002"
+        environment:
+            APP_ENV: production
+            PORT: "4002"
+            DATABASE_URL: ${DATABASE_URL}
+            REDIS_URL: ${REDIS_URL}
+            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-false}
+            JWT_SECRET: ${JWT_SECRET}
+            JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+            CORS_ORIGIN: ${CUSTOMER_WEB_URL}
+            CUSTOMER_WEB_URL: ${CUSTOMER_WEB_URL}
+            MAILTRAP_API_KEY: ${MAILTRAP_API_KEY}
+            MAILTRAP_FROM: ${MAILTRAP_FROM}
+            MAILTRAP_FROM_NAME: ${MAILTRAP_FROM_NAME}
+            SENTRY_DSN: ${SENTRY_DSN:-}
+        depends_on:
+            migrate:
+                condition: service_completed_successfully
+        healthcheck:
+            test: ["CMD", "/usr/local/bin/customer-api", "healthcheck"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        restart: unless-stopped
+        networks:
+            - app-network
+            - coolify
+
+    schedule-api:
+        image: ghcr.io/ru5ty-gate/schedule-api:main
+        pull_policy: always
+        expose:
+            - "4003"
+        environment:
+            APP_ENV: production
+            PORT: "4003"
+            DATABASE_URL: ${DATABASE_URL}
+            REDIS_URL: ${REDIS_URL}
+            REDIS_TLS_REJECT_UNAUTHORIZED: ${REDIS_TLS_REJECT_UNAUTHORIZED:-false}
+            SCHEDULE_API_KEY: ${SCHEDULE_API_KEY}
+            SCHEDULE_WEBHOOK_INTERVAL_SECONDS: ${SCHEDULE_WEBHOOK_INTERVAL_SECONDS:-60}
+            CORS_ORIGIN: ${CUSTOMER_WEB_URL}
+            SENTRY_DSN: ${SENTRY_DSN:-}
+        depends_on:
+            migrate:
+                condition: service_completed_successfully
+        healthcheck:
+            test: ["CMD", "/usr/local/bin/schedule-api", "healthcheck"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        restart: unless-stopped
+        networks:
+            - app-network
+            - coolify
+
+    api-gateway:
+        image: ghcr.io/ru5ty-gate/api-gateway:main
+        pull_policy: always
+        expose:
+            - "4000"
+        environment:
+            APP_ENV: production
+            PORT: "4000"
+            CORS_ORIGIN: ${CUSTOMER_WEB_URL}
+            CUSTOMER_API_URL: http://customer-api:4002
+            ADMIN_API_URL: http://admin-api:4001
+            SCHEDULER_API_URL: http://schedule-api:4003
+            RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-200}
+            SENTRY_DSN: ${SENTRY_DSN:-}
+        depends_on:
+            admin-api:
+                condition: service_healthy
+            customer-api:
+                condition: service_healthy
+            schedule-api:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "/usr/local/bin/api-gateway", "healthcheck"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        restart: unless-stopped
+        networks:
+            - app-network
+            - coolify
+
+    customer-web:
+        image: ghcr.io/ru5ty-gate/customer-web:main
+        pull_policy: always
+        expose:
+            - "3000"
+        depends_on:
+            api-gateway:
+                condition: service_healthy
+        restart: unless-stopped
+        networks:
+            - app-network
+            - coolify
+
+    admin-web:
+        image: ghcr.io/ru5ty-gate/admin-web:main
+        pull_policy: always
+        expose:
+            - "80"
+        depends_on:
+            api-gateway:
+                condition: service_healthy
+        restart: unless-stopped
+        networks:
+            - app-network
+            - coolify
+
+networks:
+    app-network:
+        driver: bridge
+    coolify:
+        external: true

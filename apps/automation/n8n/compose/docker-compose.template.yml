@@ -1,0 +1,113 @@
+# =============================================================================
+# n8n Project Instance Template
+# =============================================================================
+# Docker Compose template for project-specific n8n instances
+#
+# Usage:
+#   1. Copy to docker-compose.<projectSlug>.yml
+#   2. Replace all <PROJECT_SLUG> placeholders
+#   3. Create corresponding .env.<projectSlug> file
+#   4. Run: docker compose -f docker-compose.<projectSlug>.yml up -d
+# =============================================================================
+
+services:
+    n8n-<PROJECT_SLUG>:
+        image: n8nio/n8n:latest
+        container_name: n8n-<PROJECT_SLUG>
+        restart: unless-stopped
+        ports:
+            - "${N8N_PORT:-5678}:5678"
+        environment:
+            # Core Configuration
+            - N8N_HOST=${N8N_HOST}
+            - N8N_PORT=5678
+            - N8N_PROTOCOL=${N8N_PROTOCOL}
+            - WEBHOOK_URL=${WEBHOOK_URL}
+            - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+
+            # Timezone
+            - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Africa/Johannesburg}
+            - TZ=${TZ:-Africa/Johannesburg}
+
+            # Database
+            - DB_TYPE=${DB_TYPE:-postgresdb}
+            - DB_POSTGRESDB_HOST=${DB_POSTGRESDB_HOST}
+            - DB_POSTGRESDB_PORT=${DB_POSTGRESDB_PORT:-5432}
+            - DB_POSTGRESDB_DATABASE=${DB_POSTGRESDB_DATABASE}
+            - DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER}
+            - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+
+            # Authentication
+            - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
+            - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+            - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+
+            # Execution
+            - EXECUTIONS_MODE=${EXECUTIONS_MODE:-regular}
+            - EXECUTIONS_PROCESS=${EXECUTIONS_PROCESS:-main}
+            - EXECUTIONS_DATA_SAVE_ON_ERROR=${EXECUTIONS_DATA_SAVE_ON_ERROR:-all}
+            - EXECUTIONS_DATA_SAVE_ON_SUCCESS=${EXECUTIONS_DATA_SAVE_ON_SUCCESS:-all}
+            - EXECUTIONS_DATA_PRUNE=${EXECUTIONS_DATA_PRUNE:-true}
+            - EXECUTIONS_DATA_MAX_AGE=${EXECUTIONS_DATA_MAX_AGE:-168}
+
+            # Logging
+            - N8N_LOG_LEVEL=${N8N_LOG_LEVEL:-info}
+            - N8N_LOG_OUTPUT=${N8N_LOG_OUTPUT:-console}
+
+            # Metrics
+            - N8N_METRICS=${N8N_METRICS:-false}
+            - N8N_METRICS_PREFIX=${N8N_METRICS_PREFIX:-n8n_}
+
+            # User Management
+            - N8N_USER_MANAGEMENT_DISABLED=${N8N_USER_MANAGEMENT_DISABLED:-false}
+
+            # Security
+            - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE:-true}
+        volumes:
+            - n8n_data_<PROJECT_SLUG>:/home/node/.n8n
+        networks:
+            - n8n-<PROJECT_SLUG>-network
+            - ru5ty-gate-dev
+        healthcheck:
+            test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
+        depends_on:
+            postgres-n8n-<PROJECT_SLUG>:
+                condition: service_healthy
+
+    # Project-specific PostgreSQL (optional - can use external DB)
+    postgres-n8n-<PROJECT_SLUG>:
+        image: postgres:16-alpine
+        container_name: postgres-n8n-<PROJECT_SLUG>
+        restart: unless-stopped
+        environment:
+            - POSTGRES_USER=${DB_POSTGRESDB_USER}
+            - POSTGRES_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+            - POSTGRES_DB=${DB_POSTGRESDB_DATABASE}
+        volumes:
+            - n8n_db_<PROJECT_SLUG>:/var/lib/postgresql/data
+        networks:
+            - n8n-<PROJECT_SLUG>-network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_POSTGRESDB_USER} -d ${DB_POSTGRESDB_DATABASE}"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+
+volumes:
+    n8n_data_<PROJECT_SLUG>:
+        name: n8n_data_<PROJECT_SLUG>
+    n8n_db_<PROJECT_SLUG>:
+        name: n8n_db_<PROJECT_SLUG>
+
+networks:
+    n8n-<PROJECT_SLUG>-network:
+        name: n8n-<PROJECT_SLUG>-network
+        driver: bridge
+    ru5ty-gate-dev:
+        external: true
+        name: ru5ty-gate-dev-network

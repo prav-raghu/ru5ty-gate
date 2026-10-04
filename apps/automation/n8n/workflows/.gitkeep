@@ -1,0 +1,16 @@
+# Exported workflows directory
+# Each project gets its own subdirectory for workflow backups
+
+# Example structure:
+# workflows/
+#   acme-corp/
+#     backup-2026-02-02/
+#       manifest.json
+#       workflows.json
+#       credentials.json
+#       workflows/
+#         workflow-id-1.json
+#         workflow-id-2.json
+#     latest -> backup-2026-02-02
+#   client-xyz/
+#     ...

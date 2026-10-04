@@ -1,0 +1,80 @@
+# =============================================================================
+# n8n Development Instance
+# =============================================================================
+# Local development instance that connects to the shared monorepo PostgreSQL
+#
+# Usage:
+#   1. Ensure the main devops/docker-compose.dev.yml is running
+#   2. Create n8n_dev database: docker exec -it ru5ty-gate-postgres-dev psql -U postgres -c "CREATE DATABASE n8n_dev;"
+#   3. Run: docker compose -f docker-compose.dev.yml up -d
+#   4. Access: http://localhost:4008
+# =============================================================================
+
+services:
+    n8n-dev:
+        image: n8nio/n8n:latest
+        container_name: n8n-dev
+        restart: unless-stopped
+        ports:
+            - "4008:5678"
+        environment:
+            # Core Configuration
+            - N8N_HOST=${N8N_HOST:-localhost}
+            - N8N_PORT=5678
+            - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+            - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:4008}
+            - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-dev_only_not_for_production_change_me_32chars}
+
+            # Timezone
+            - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Africa/Johannesburg}
+            - TZ=${TZ:-Africa/Johannesburg}
+
+            # Database (connects to shared monorepo Postgres)
+            - DB_TYPE=postgresdb
+            - DB_POSTGRESDB_HOST=${DB_POSTGRESDB_HOST:-host.docker.internal}
+            - DB_POSTGRESDB_PORT=${DB_POSTGRESDB_PORT:-5432}
+            - DB_POSTGRESDB_DATABASE=${DB_POSTGRESDB_DATABASE:-n8n_dev}
+            - DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER:-postgres}
+            - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD:-postgres}
+
+            # Authentication (disabled for local dev)
+            - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-false}
+
+            # Execution
+            - EXECUTIONS_MODE=regular
+            - EXECUTIONS_PROCESS=main
+            - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+            - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+            - EXECUTIONS_DATA_PRUNE=true
+            - EXECUTIONS_DATA_MAX_AGE=72
+
+            # Logging (verbose for dev)
+            - N8N_LOG_LEVEL=${N8N_LOG_LEVEL:-debug}
+            - N8N_LOG_OUTPUT=console
+
+            # User Management (disabled for simple dev)
+            - N8N_USER_MANAGEMENT_DISABLED=${N8N_USER_MANAGEMENT_DISABLED:-true}
+
+            # Security (relaxed for local dev)
+            - N8N_SECURE_COOKIE=false
+        volumes:
+            - n8n_data_dev:/home/node/.n8n
+        networks:
+            - ru5ty-gate-dev
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        healthcheck:
+            test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
+
+volumes:
+    n8n_data_dev:
+        name: n8n_data_dev
+
+networks:
+    ru5ty-gate-dev:
+        external: true
+        name: ru5ty-gate-dev-network

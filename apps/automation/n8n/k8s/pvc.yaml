@@ -1,0 +1,27 @@
+# =============================================================================
+# n8n Persistent Volume Claim
+# =============================================================================
+# Storage for n8n data (workflows, credentials cache, etc.)
+# Replace <PROJECT_SLUG> with your project identifier
+# =============================================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: n8n-data
+    namespace: <PROJECT_SLUG>
+    labels:
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/instance: n8n-<PROJECT_SLUG>
+        app.kubernetes.io/component: automation
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 5Gi
+    # Uncomment and set your storage class
+    # storageClassName: standard
+    # storageClassName: gp2          # AWS EBS
+    # storageClassName: managed-csi  # Azure
+    # storageClassName: standard-rwo # GCP

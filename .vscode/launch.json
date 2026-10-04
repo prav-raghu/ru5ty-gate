@@ -1,0 +1,179 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🌐 API Gateway",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["build", "--bin", "api-gateway", "--package", "ru5ty-gate-api-gateway"],
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" },
+                "filter": { "name": "api-gateway", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}/apps/backend/api-gateway",
+            "envFile": "${workspaceFolder}/apps/backend/api-gateway/.env",
+            "presentation": { "group": "Backend Services", "order": 0 }
+        },
+        {
+            "name": "👤 Customer API",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["build", "--bin", "customer-api", "--package", "ru5ty-gate-customer-api"],
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" },
+                "filter": { "name": "customer-api", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}/apps/backend/customer-api",
+            "envFile": "${workspaceFolder}/apps/backend/customer-api/.env",
+            "presentation": { "group": "Backend Services", "order": 1 }
+        },
+        {
+            "name": "🔐 Admin API",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["build", "--bin", "admin-api", "--package", "ru5ty-gate-admin-api"],
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" },
+                "filter": { "name": "admin-api", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}/apps/backend/admin-api",
+            "envFile": "${workspaceFolder}/apps/backend/admin-api/.env",
+            "presentation": { "group": "Backend Services", "order": 2 }
+        },
+        {
+            "name": "📅 Schedule API",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["build", "--bin", "schedule-api", "--package", "ru5ty-gate-schedule-api"],
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" },
+                "filter": { "name": "schedule-api", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}/apps/backend/schedule-api",
+            "envFile": "${workspaceFolder}/apps/backend/schedule-api/.env",
+            "presentation": { "group": "Backend Services", "order": 3 }
+        },
+        {
+            "name": "📡 Agent (Captive Portal)",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["build", "--bin", "ru5ty-gate-agent", "--package", "ru5ty-gate-agent"],
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" },
+                "filter": { "name": "ru5ty-gate-agent", "kind": "bin" }
+            },
+            "args": ["--config", "${workspaceFolder}/apps/backend/agent/config/agent.toml"],
+            "cwd": "${workspaceFolder}/apps/backend/agent",
+            "presentation": { "group": "Backend Services", "order": 4 }
+        },
+        {
+            "name": "🌐 Customer Web (Next.js)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "pnpm dev:customer-web",
+            "cwd": "${workspaceFolder}",
+            "serverReadyAction": {
+                "pattern": "Local:.*?(https?://localhost:\\d+)",
+                "uriFormat": "%s",
+                "action": "debugWithEdge",
+                "webRoot": "${workspaceFolder}/apps/frontend/customer-web"
+            },
+            "presentation": { "group": "Frontend Apps", "order": 1 }
+        },
+        {
+            "name": "🛠️ Admin Web (Vite)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "pnpm dev:admin-web",
+            "cwd": "${workspaceFolder}",
+            "serverReadyAction": {
+                "pattern": "Local:.*?(https?://localhost:\\d+)",
+                "uriFormat": "%s",
+                "action": "debugWithEdge",
+                "webRoot": "${workspaceFolder}/apps/frontend/admin-web"
+            },
+            "presentation": { "group": "Frontend Apps", "order": 2 }
+        },
+        {
+            "name": "📱 Customer Mobile (Expo)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "pnpm --filter customer-mobile dev",
+            "cwd": "${workspaceFolder}",
+            "presentation": { "group": "Frontend Apps", "order": 3 }
+        },
+        {
+            "name": "📰 CMS (Strapi)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run develop",
+            "cwd": "${workspaceFolder}/apps/cms",
+            "presentation": { "group": "Backend Services", "order": 4 }
+        },
+        {
+            "name": "🧪 Debug Rust Tests",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["test", "--no-run", "--workspace"],
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" }
+            },
+            "cwd": "${workspaceFolder}",
+            "presentation": { "group": "Testing", "order": 1 }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "💻 Full Dev Environment",
+            "configurations": [
+                "🌐 API Gateway",
+                "🔐 Admin API",
+                "👤 Customer API",
+                "📅 Schedule API",
+                "🛠️ Admin Web (Vite)",
+                "🌐 Customer Web (Next.js)",
+                "📱 Customer Mobile (Expo)"
+            ],
+            "preLaunchTask": "🔨 Build: All Backend",
+            "stopAll": true,
+            "presentation": { "group": "Compound Launches", "order": 1 }
+        },
+        {
+            "name": "🛠️ Admin Stack (API + Web)",
+            "configurations": ["🔐 Admin API", "🛠️ Admin Web (Vite)"],
+            "preLaunchTask": "🔨 Build: Admin API",
+            "stopAll": true,
+            "presentation": { "group": "Compound Launches", "order": 2 }
+        },
+        {
+            "name": "🌐 Customer Stack (API + Web)",
+            "configurations": ["👤 Customer API", "🌐 Customer Web (Next.js)"],
+            "preLaunchTask": "🔨 Build: Customer API",
+            "stopAll": true,
+            "presentation": { "group": "Compound Launches", "order": 3 }
+        },
+        {
+            "name": "🔥 Full Backend Stack (APIs only)",
+            "configurations": ["🌐 API Gateway", "🔐 Admin API", "👤 Customer API", "📅 Schedule API"],
+            "preLaunchTask": "🔨 Build: All Backend",
+            "stopAll": true,
+            "presentation": { "group": "Compound Launches", "order": 4 }
+        },
+        {
+            "name": "💻 Full Dev + CMS (needs Strapi setup)",
+            "configurations": [
+                "🌐 API Gateway",
+                "🔐 Admin API",
+                "👤 Customer API",
+                "📅 Schedule API",
+                "🛠️ Admin Web (Vite)",
+                "🌐 Customer Web (Next.js)",
+                "📱 Customer Mobile (Expo)",
+                "📰 CMS (Strapi)"
+            ],
+            "preLaunchTask": "🔨 Build: All Backend",
+            "stopAll": true,
+            "presentation": { "group": "Compound Launches", "order": 5 }
+        }
+    ]
+}

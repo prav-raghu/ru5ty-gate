@@ -1,0 +1,57 @@
+[package]
+name = "ru5ty-gate-customer-api"
+description = "Customer API"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "customer_api"
+path = "src/lib.rs"
+
+[[bin]]
+name = "customer-api"
+path = "src/main.rs"
+
+[dependencies]
+async-trait = "0.1.92"
+axum = { version = "0.8.9", features = ["macros"] }
+bcrypt = "0.19.3"
+bytes = "1.12.1"
+chrono = "0.4.45"
+dotenvy = "0.15.7"
+futures-util = "0.3.34"
+ru5ty-gate-auth = { version = "1.0.0", path = "../../../common/auth" }
+ru5ty-gate-cache = { version = "1.0.0", path = "../../../common/cache" }
+ru5ty-gate-config = { version = "1.0.0", path = "../../../common/config" }
+ru5ty-gate-database = { version = "1.0.0", path = "../../../common/database" }
+ru5ty-gate-email = { version = "1.0.0", path = "../../../common/email" }
+ru5ty-gate-export = { version = "1.0.0", path = "../../../common/export" }
+ru5ty-gate-http = { version = "1.0.0", path = "../../../common/http" }
+ru5ty-gate-logging = { version = "1.0.0", path = "../../../common/logging" }
+ru5ty-gate-observability = { version = "1.0.0", path = "../../../common/observability" }
+ru5ty-gate-types = { version = "1.0.0", path = "../../../common/types" }
+ru5ty-gate-utilities = { version = "1.0.0", path = "../../../common/utilities" }
+ru5ty-gate-webhooks = { version = "1.0.0", path = "../../../common/webhooks" }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sqlx = { version = "0.9.0", default-features = false, features = ["postgres", "uuid", "chrono", "json", "derive"] }
+thiserror.workspace = true
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync"] }
+tower = { version = "0.5.3", features = ["util"] }
+tower-http = { version = "0.7.1", features = ["cors"] }
+tracing = "0.1.44"
+urlencoding = "2.1.3"
+uuid = { version = "1.26.1", features = ["v4", "serde"] }
+validator = { version = "0.21.0", features = ["derive"] }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+async-trait = "0.1.92"
+http-body-util = "0.1.5"
+tower = { version = "0.5.3", features = ["util"] }

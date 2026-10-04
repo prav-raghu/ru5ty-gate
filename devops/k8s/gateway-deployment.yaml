@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ru5ty-gate-api-gateway
+  labels:
+    app: ru5ty-gate
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ru5ty-gate
+      tier: api-gateway
+  template:
+    metadata:
+      labels:
+        app: ru5ty-gate
+        tier: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: your-docker-repo/ru5ty-gate-api-gateway:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_ENV
+              value: production
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: secret
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: database-url
+                  key: url
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ru5ty-gate-api-gateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: ru5ty-gate
+    tier: api-gateway

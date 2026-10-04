@@ -1,0 +1,101 @@
+# name: Security Scan
+
+# on:
+#     push:
+#         branches: [main]
+#     pull_request:
+#         branches: [main]
+#     schedule:
+#         - cron: "0 6 * * 1"
+
+# permissions:
+#     contents: read
+#     actions: read
+
+# jobs:
+#     dependency-audit:
+#         name: Dependency Audit
+#         runs-on: ubuntu-latest
+#         steps:
+#             - name: Checkout
+#               uses: actions/checkout@v4
+
+#             - name: Setup pnpm
+#               uses: pnpm/action-setup@v4
+
+#             - name: Setup Node.js
+#               uses: actions/setup-node@v4
+#               with:
+#                   node-version: "22"
+#                   cache: "pnpm"
+
+#             - name: Install dependencies
+#               run: pnpm install --frozen-lockfile
+
+#             - name: Run pnpm audit
+#               run: pnpm audit --audit-level=high
+#               continue-on-error: true
+
+#     codeql:
+#         name: CodeQL Analysis
+#         runs-on: ubuntu-latest
+#         steps:
+#             - name: Checkout
+#               uses: actions/checkout@v4
+
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v3
+#               with:
+#                   languages: javascript-typescript
+#                   queries: security-and-quality
+
+#             - name: Autobuild
+#               uses: github/codeql-action/autobuild@v3
+
+#             - name: Perform CodeQL Analysis
+#               uses: github/codeql-action/analyze@v3
+#               with:
+#                   category: "/language:javascript-typescript"
+#                   upload: never
+#                   output: codeql-results
+
+#             - name: Upload SARIF results as artifact
+#               uses: actions/upload-artifact@v4
+#               with:
+#                   name: codeql-sarif
+#                   path: codeql-results
+#                   retention-days: 30
+
+#             - name: Fail on high severity findings
+#               run: |
+#                   COUNT=$(jq '[.runs[].results[] | select(.level == "error")] | length' codeql-results/javascript.sarif)
+#                   echo "High severity findings: $COUNT"
+#                   if [ "$COUNT" -gt 0 ]; then
+#                     jq -r '.runs[].results[] | select(.level == "error") | "\(.ruleId): \(.locations[0].physicalLocation.artifactLocation.uri):\(.locations[0].physicalLocation.region.startLine)"' codeql-results/javascript.sarif
+#                     exit 1
+#                   fi
+
+#     secrets-scan:
+#         name: Secrets Scan
+#         runs-on: ubuntu-latest
+#         steps:
+#             - name: Checkout
+#               uses: actions/checkout@v4
+#               with:
+#                   fetch-depth: 0
+
+#             - name: TruffleHog OSS Scan (PR diff)
+#               if: github.event_name == 'pull_request'
+#               uses: trufflesecurity/trufflehog@main
+#               with:
+#                   path: ./
+#                   base: ${{ github.event.pull_request.base.sha }}
+#                   head: ${{ github.event.pull_request.head.sha }}
+#                   extra_args: --only-verified
+
+#             - name: TruffleHog OSS Scan (full history)
+#               if: github.event_name != 'pull_request'
+#               uses: trufflesecurity/trufflehog@main
+#               with:
+#                   path: ./
+#                   extra_args: --only-verified

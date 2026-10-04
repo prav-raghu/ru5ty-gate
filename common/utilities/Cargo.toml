@@ -1,0 +1,22 @@
+[package]
+name = "ru5ty-gate-utilities"
+description = "Crypto, date, password and webhook signature helpers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+aes-gcm = "0.11.1"
+bcrypt = "0.19.3"
+chrono = "0.4.45"
+hex = "0.4.3"
+hmac = "0.13.0"
+rand = "0.10.3"
+sha2 = "0.11.0"
+thiserror.workspace = true
+tokio = { version = "1.53.1", features = ["rt", "macros"] }
+
+[lints]
+workspace = true

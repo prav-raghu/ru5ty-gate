@@ -1,0 +1,26 @@
+# =============================================================================
+# n8n Service
+# =============================================================================
+# ClusterIP service for internal access and ingress
+# Replace <PROJECT_SLUG> with your project identifier
+# =============================================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+    name: n8n
+    namespace: <PROJECT_SLUG>
+    labels:
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/instance: n8n-<PROJECT_SLUG>
+        app.kubernetes.io/component: automation
+spec:
+    type: ClusterIP
+    ports:
+        - name: http
+          port: 80
+          targetPort: 5678
+          protocol: TCP
+    selector:
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/instance: n8n-<PROJECT_SLUG>

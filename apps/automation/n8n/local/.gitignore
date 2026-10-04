@@ -1,0 +1,6 @@
+# Local n8n data directory
+# This folder is created when running n8n locally (non-Docker)
+.n8n/
+
+# Environment file with actual values
+.env.local

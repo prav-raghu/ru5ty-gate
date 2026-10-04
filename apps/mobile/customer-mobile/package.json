@@ -1,0 +1,24 @@
+{
+    "name": "@ru5ty-gate/customer-mobile",
+    "private": true,
+    "version": "0.0.1",
+    "main": "index.ts",
+    "scripts": {
+        "dev": "expo start --port 4007",
+        "start": "expo start --port 4007",
+        "android": "expo start --android --port 4007",
+        "ios": "expo start --ios --port 4007",
+        "build": "expo export",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "expo": "~57.0.26",
+        "expo-status-bar": "~57.0.1",
+        "react": "19.2.3",
+        "react-native": "0.86.3"
+    },
+    "devDependencies": {
+        "@types/react": "~19.2.2",
+        "typescript": "~6.0.3"
+    }
+}

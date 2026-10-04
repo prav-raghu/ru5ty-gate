@@ -1,0 +1,48 @@
+[package]
+name = "ru5ty-gate-api-gateway"
+description = "API Gateway"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "api_gateway"
+path = "src/lib.rs"
+
+[[bin]]
+name = "api-gateway"
+path = "src/main.rs"
+
+[dependencies]
+async-graphql = "7.2.1"
+async-graphql-axum = "7.2.1"
+async-trait = "0.1.92"
+axum = { version = "0.8.9", features = ["macros"] }
+chrono = "0.4.45"
+dotenvy = "0.15.7"
+futures-util = "0.3.34"
+http = "1.5.0"
+ru5ty-gate-config = { version = "1.0.0", path = "../../../common/config" }
+ru5ty-gate-http = { version = "1.0.0", path = "../../../common/http" }
+ru5ty-gate-logging = { version = "1.0.0", path = "../../../common/logging" }
+ru5ty-gate-metrics = { version = "1.0.0", path = "../../../common/metrics" }
+ru5ty-gate-observability = { version = "1.0.0", path = "../../../common/observability" }
+ru5ty-gate-types = { version = "1.0.0", path = "../../../common/types" }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "stream"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror.workspace = true
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync"] }
+tower = { version = "0.5.3", features = ["util"] }
+tracing = "0.1.44"
+
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+http-body-util = "0.1.5"
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls"] }
+tower = { version = "0.5.3", features = ["util"] }

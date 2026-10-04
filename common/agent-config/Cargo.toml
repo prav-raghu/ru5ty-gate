@@ -1,0 +1,16 @@
+[package]
+name = "ru5ty-gate-agent-config"
+description = "TOML settings for the captive portal agent"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+thiserror.workspace = true
+toml = "1.1.6"
+
+[lints]
+workspace = true

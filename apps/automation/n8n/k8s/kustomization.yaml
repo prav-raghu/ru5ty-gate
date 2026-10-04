@@ -1,0 +1,23 @@
+# =============================================================================
+# Kustomization for n8n
+# =============================================================================
+# Use with: kubectl apply -k k8s/
+# Replace <PROJECT_SLUG> before using
+# =============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: <PROJECT_SLUG>
+
+resources:
+    - namespace.yaml
+    - configmap.yaml
+    - pvc.yaml
+    - deployment.yaml
+    - service.yaml
+    - ingress.yaml
+
+commonLabels:
+    app.kubernetes.io/managed-by: kustomize
+    project: <PROJECT_SLUG>

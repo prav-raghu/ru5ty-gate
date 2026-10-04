@@ -1,0 +1,17 @@
+{
+    "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+    "changelog": [
+        "@changesets/changelog-github",
+        {
+            "repo": "your-org/ru5ty-gate"
+        }
+    ],
+    "commit": false,
+    "fixed": [],
+    "linked": [],
+    "access": "restricted",
+    "baseBranch": "main",
+    "updateInternalDependencies": "patch",
+    "ignore": [],
+    "___privateForChangesetsToRemove_experimentalSafeMode": false
+}

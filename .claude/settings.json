@@ -1,0 +1,90 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(cargo build*)",
+            "Bash(cargo check*)",
+            "Bash(cargo test*)",
+            "Bash(cargo clippy*)",
+            "Bash(cargo fmt*)",
+            "Bash(cargo deny*)",
+            "Bash(cargo tree*)",
+            "Bash(cargo add *)",
+            "Bash(cargo remove *)",
+            "Bash(cargo run --bin * healthcheck*)",
+            "Bash(pnpm install*)",
+            "Bash(pnpm add *)",
+            "Bash(pnpm remove *)",
+            "Bash(pnpm list*)",
+            "Bash(pnpm --filter admin-web build)",
+            "Bash(pnpm --filter admin-web dev)",
+            "Bash(pnpm --filter admin-web typecheck)",
+            "Bash(pnpm --filter customer-web build)",
+            "Bash(pnpm --filter customer-web dev)",
+            "Bash(pnpm --filter customer-web typecheck)",
+            "Bash(pnpm test*)",
+            "Bash(pnpm lint*)",
+            "Bash(pnpm typecheck)",
+            "Bash(pnpm format:check)",
+            "Bash(grep *)",
+            "Bash(find *)",
+            "Bash(git status)",
+            "Bash(git diff*)",
+            "Bash(git log*)",
+            "Bash(git pull*)",
+            "Bash(git push*)",
+            "Bash(git commit*)"
+        ],
+        "deny": [
+            "Bash(*sqlx migrate*)",
+            "Bash(*sqlx database*)",
+            "Bash(*admin-api migrate*)",
+            "Bash(*admin-api -- migrate*)",
+            "Bash(*DROP DATABASE*)",
+            "Bash(git merge*)",
+            "Bash(git rebase*)",
+            "Bash(git reset*)",
+            "Bash(git clean*)",
+            "Bash(git checkout -- *)",
+            "Bash(git restore *)",
+            "Bash(rm -rf*)",
+            "Bash(docker system prune*)",
+            "Bash(docker volume rm*)",
+            "Bash(docker compose down -v*)",
+            "Bash(docker-compose down -v*)",
+            "Bash(terraform destroy*)",
+            "Bash(kubectl delete*)"
+        ]
+    },
+    "hooks": {
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/guard-main-branch.sh"
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/typecheck-changed.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/validate-no-any.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/cargo-check-changed.sh"
+                    }
+                ]
+            }
+        ]
+    }
+}

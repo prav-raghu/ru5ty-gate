@@ -1,0 +1,50 @@
+[package]
+name = "ru5ty-gate-schedule-api"
+description = "Schedule API"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "schedule_api"
+path = "src/lib.rs"
+
+[[bin]]
+name = "schedule-api"
+path = "src/main.rs"
+
+[dependencies]
+async-trait = "0.1.92"
+axum = { version = "0.8.9", features = ["macros"] }
+chrono = "0.4.45"
+dotenvy = "0.15.7"
+ru5ty-gate-cache = { version = "1.0.0", path = "../../../common/cache" }
+ru5ty-gate-config = { version = "1.0.0", path = "../../../common/config" }
+ru5ty-gate-database = { version = "1.0.0", path = "../../../common/database" }
+ru5ty-gate-http = { version = "1.0.0", path = "../../../common/http" }
+ru5ty-gate-logging = { version = "1.0.0", path = "../../../common/logging" }
+ru5ty-gate-observability = { version = "1.0.0", path = "../../../common/observability" }
+ru5ty-gate-types = { version = "1.0.0", path = "../../../common/types" }
+ru5ty-gate-webhooks = { version = "1.0.0", path = "../../../common/webhooks" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sqlx = { version = "0.9.0", default-features = false, features = ["postgres", "uuid", "chrono", "json", "derive"] }
+subtle = "2.6.1"
+thiserror.workspace = true
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "signal", "net", "time", "sync"] }
+tower = { version = "0.5.3", features = ["util"] }
+tracing = "0.1.44"
+uuid = { version = "1.26.1", features = ["v4", "serde"] }
+
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+async-trait = "0.1.92"
+http-body-util = "0.1.5"
+ru5ty-gate-utilities = { path = "../../../common/utilities" }
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls"] }
+tower = { version = "0.5.3", features = ["util"] }

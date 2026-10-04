@@ -1,0 +1,22 @@
+[package]
+name = "ru5ty-gate-heartbeat"
+description = "Scheduled heartbeat and buffered event sync tasks"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+ru5ty-gate-central-client = { version = "1.0.0", path = "../central-client" }
+ru5ty-gate-session-store = { version = "1.0.0", path = "../session-store" }
+tokio = { version = "1.53.1", features = ["rt", "time"] }
+tracing = "0.1.44"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+axum = "0.8.9"
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "time"] }

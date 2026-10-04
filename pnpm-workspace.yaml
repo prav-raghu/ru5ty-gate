@@ -1,0 +1,14 @@
+packages:
+    - "apps/frontend/*"
+    - "apps/mobile/*"
+    # apps/cms is excluded — managed independently with npm
+
+verifyDepsBeforeRun: false
+
+allowBuilds:
+    "@sentry/cli": true
+    core-js: true
+    cypress: true
+    esbuild: true
+    sharp: true
+    unrs-resolver: true

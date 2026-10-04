@@ -1,0 +1,475 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "📦 Install Dependencies",
+            "type": "shell",
+            "command": "pnpm install",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔨 Build All",
+            "type": "shell",
+            "command": "pnpm build && cargo build --workspace",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$rustc",
+                "$tsc"
+            ]
+        },
+        {
+            "label": "🧹 Clean All",
+            "type": "shell",
+            "command": "pnpm clean",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🧪 Run All Tests",
+            "type": "shell",
+            "command": "cargo test --workspace && pnpm test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔍 Lint All",
+            "type": "shell",
+            "command": "pnpm lint",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$eslint-stylish"
+            ]
+        },
+        {
+            "label": "✨ Format All",
+            "type": "shell",
+            "command": "pnpm format",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔨 Build: Admin API",
+            "type": "shell",
+            "command": "cargo build --bin admin-api",
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" }
+            },
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "🔨 Build: Customer API",
+            "type": "shell",
+            "command": "cargo build --bin customer-api",
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" }
+            },
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "🔨 Build: All Backend",
+            "type": "shell",
+            "command": "cargo build --bin api-gateway --bin admin-api --bin customer-api --bin schedule-api --bin ru5ty-gate-agent",
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": { "CARGO_PROFILE_DEV_DEBUG": "true" }
+            },
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "🗄️ DB: Create ru5ty_gate (asks for the postgres password)",
+            "type": "shell",
+            "command": "psql -U postgres -h localhost -c \"CREATE DATABASE ru5ty_gate;\"",
+            "windows": {
+                "command": "& 'C:\\Program Files\\PostgreSQL\\17\\bin\\psql.exe' -U postgres -h localhost -c 'CREATE DATABASE ru5ty_gate;'"
+            },
+            "group": "none",
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": []
+        },
+        {
+            "label": "🗄️ DB: Migrate",
+            "type": "shell",
+            "command": "cargo run --bin admin-api -- migrate",
+            "group": "none",
+            "options": { "cwd": "${workspaceFolder}/apps/backend/admin-api" },
+            "presentation": { "reveal": "always", "panel": "shared" },
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "👤 Dev: Customer API",
+            "type": "shell",
+            "command": "cargo run --bin customer-api",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "backend"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "listening|Listening"
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/apps/backend/customer-api"
+            }
+        },
+        {
+            "label": "🔐 Dev: Admin API",
+            "type": "shell",
+            "command": "cargo run --bin admin-api",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "backend"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "listening|Listening"
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/apps/backend/admin-api"
+            }
+        },
+        {
+            "label": "📅 Dev: Schedule API",
+            "type": "shell",
+            "command": "cargo run --bin schedule-api",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "backend"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "listening|Listening"
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/apps/backend/schedule-api"
+            }
+        },
+        {
+            "label": "📡 Dev: Agent",
+            "type": "shell",
+            "command": "cargo run --bin ru5ty-gate-agent -- --config config/agent.toml",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "backend"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "listening|Listening"
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/apps/backend/agent"
+            }
+        },
+        {
+            "label": "🌐 Dev: Customer Web",
+            "type": "shell",
+            "command": "pnpm dev:customer-web",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "frontend"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "ready"
+                }
+            }
+        },
+        {
+            "label": "🛠️ Dev: Admin Web",
+            "type": "shell",
+            "command": "pnpm dev:admin-web",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "frontend"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "ready"
+                }
+            }
+        },
+        {
+            "label": "🐳 Docker: Start Dev",
+            "type": "shell",
+            "command": "docker compose -f devops/docker-compose.dev.yml up -d",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🐳 Docker: Stop Dev",
+            "type": "shell",
+            "command": "docker compose -f devops/docker-compose.dev.yml down",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🐳 Docker: View Logs",
+            "type": "shell",
+            "command": "docker compose -f devops/docker-compose.dev.yml logs -f",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔄 Update Dependencies",
+            "type": "shell",
+            "command": "pnpm update-deps",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔥 Start Full Backend Stack",
+            "dependsOn": [
+                "🐳 Docker: Start Dev",
+                "👤 Dev: Customer API",
+                "🔐 Dev: Admin API",
+                "📅 Dev: Schedule API"
+            ],
+            "dependsOrder": "sequence",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🤖 n8n: Start Dev Instance",
+            "type": "shell",
+            "command": "docker compose -f apps/automation/n8n/compose/docker-compose.dev.yml --env-file apps/automation/n8n/compose/.env.dev up -d",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🤖 n8n: Stop Dev Instance",
+            "type": "shell",
+            "command": "docker compose -f apps/automation/n8n/compose/docker-compose.dev.yml down",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🤖 n8n: View Logs",
+            "type": "shell",
+            "command": "docker compose -f apps/automation/n8n/compose/docker-compose.dev.yml logs -f",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🤖 n8n: Create Database",
+            "type": "shell",
+            "command": "docker exec -it ru5ty-gate-postgres-dev psql -U postgres -c \"CREATE DATABASE n8n_dev;\"",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🤖 n8n: Start Local (No Docker)",
+            "type": "shell",
+            "command": "pnpm n8n:local",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "n8n"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*)$",
+                    "message": 1
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Starting n8n",
+                    "endsPattern": "Editor is now accessible"
+                }
+            }
+        },
+        {
+            "label": "🤖 n8n: Install Globally",
+            "type": "shell",
+            "command": "npm install -g n8n",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "🤖 n8n: Quick Start (SQLite)",
+            "type": "shell",
+            "command": "n8n start",
+            "group": "none",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "n8n"
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*)$",
+                    "message": 1
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "Editor is now accessible"
+                }
+            }
+        }
+    ]
+}

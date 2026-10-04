@@ -1,0 +1,55 @@
+# =============================================================================
+# n8n ConfigMap
+# =============================================================================
+# Non-sensitive configuration for n8n instance
+# Replace <PROJECT_SLUG> with your project identifier
+# =============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: n8n-config
+    namespace: <PROJECT_SLUG>
+    labels:
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/instance: n8n-<PROJECT_SLUG>
+        app.kubernetes.io/component: automation
+data:
+    # Core Configuration
+    N8N_HOST: "n8n.<PROJECT_SLUG>.yourdomain.co.za"
+    N8N_PORT: "5678"
+    N8N_PROTOCOL: "https"
+    WEBHOOK_URL: "https://n8n.<PROJECT_SLUG>.yourdomain.co.za"
+
+    # Timezone
+    GENERIC_TIMEZONE: "Africa/Johannesburg"
+    TZ: "Africa/Johannesburg"
+
+    # Database Type
+    DB_TYPE: "postgresdb"
+    DB_POSTGRESDB_PORT: "5432"
+
+    # Execution Settings
+    EXECUTIONS_MODE: "regular"
+    EXECUTIONS_PROCESS: "main"
+    EXECUTIONS_DATA_SAVE_ON_ERROR: "all"
+    EXECUTIONS_DATA_SAVE_ON_SUCCESS: "all"
+    EXECUTIONS_DATA_SAVE_ON_PROGRESS: "false"
+    EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: "true"
+    EXECUTIONS_DATA_PRUNE: "true"
+    EXECUTIONS_DATA_MAX_AGE: "168"
+
+    # Logging
+    N8N_LOG_LEVEL: "info"
+    N8N_LOG_OUTPUT: "console"
+
+    # Metrics (for Prometheus scraping)
+    N8N_METRICS: "true"
+    N8N_METRICS_PREFIX: "n8n_"
+
+    # User Management
+    N8N_USER_MANAGEMENT_DISABLED: "false"
+
+    # Security
+    N8N_SECURE_COOKIE: "true"
+    N8N_BASIC_AUTH_ACTIVE: "true"

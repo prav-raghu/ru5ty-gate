@@ -1,0 +1,16 @@
+# =============================================================================
+# n8n Namespace Template
+# =============================================================================
+# Create a dedicated namespace for each project's n8n instance
+# Replace <PROJECT_SLUG> with your project identifier
+# =============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: <PROJECT_SLUG>
+    labels:
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/instance: n8n-<PROJECT_SLUG>
+        app.kubernetes.io/component: automation
+        project: <PROJECT_SLUG>

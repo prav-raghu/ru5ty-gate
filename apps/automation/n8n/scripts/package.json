@@ -1,0 +1,19 @@
+{
+    "name": "@ru5ty-gate/n8n-scripts",
+    "version": "1.0.0",
+    "private": true,
+    "description": "n8n automation scripts for instance management",
+    "type": "module",
+    "scripts": {
+        "start-local": "tsx start-local.ts",
+        "create-instance": "tsx create-instance.ts"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.5"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "tsx": "^4.19.0",
+        "typescript": "^5.6.0"
+    }
+}

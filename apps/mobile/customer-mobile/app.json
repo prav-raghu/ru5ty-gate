@@ -1,0 +1,25 @@
+{
+    "expo": {
+        "name": "Customer Mobile",
+        "slug": "customer-mobile",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "light",
+        "platforms": ["ios", "android"],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.ru5tygate.customer"
+        },
+        "android": {
+            "package": "com.ru5tygate.customer",
+            "adaptiveIcon": {
+                "backgroundColor": "#E6F4FE",
+                "foregroundImage": "./assets/android-icon-foreground.png",
+                "backgroundImage": "./assets/android-icon-background.png",
+                "monochromeImage": "./assets/android-icon-monochrome.png"
+            },
+            "predictiveBackGestureEnabled": false
+        }
+    }
+}

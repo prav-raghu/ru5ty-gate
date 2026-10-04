@@ -1,0 +1,59 @@
+# =============================================================================
+# n8n Ingress
+# =============================================================================
+# Ingress for external HTTPS access
+# Replace <PROJECT_SLUG> with your project identifier
+#
+# Prerequisites:
+#   - Ingress controller installed (nginx-ingress, traefik, etc.)
+#   - cert-manager for TLS certificates (optional but recommended)
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: n8n
+    namespace: <PROJECT_SLUG>
+    labels:
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/instance: n8n-<PROJECT_SLUG>
+        app.kubernetes.io/component: automation
+    annotations:
+        # Nginx Ingress Controller
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+        # WebSocket support (required for n8n editor)
+        nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+        nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+
+        # Rate limiting (optional)
+        nginx.ingress.kubernetes.io/limit-rps: "50"
+        nginx.ingress.kubernetes.io/limit-connections: "20"
+
+        # cert-manager for automatic TLS certificates
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+        # Uncomment for Traefik
+        # kubernetes.io/ingress.class: traefik
+        # traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        # traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+    tls:
+        - hosts:
+              - n8n.<PROJECT_SLUG>.yourdomain.co.za
+          secretName: n8n-<PROJECT_SLUG>-tls
+    rules:
+        - host: n8n.<PROJECT_SLUG>.yourdomain.co.za
+          http:
+              paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: n8n
+                            port:
+                                number: 80

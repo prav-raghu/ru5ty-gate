@@ -1,0 +1,16 @@
+# n8n Sensitive Files
+# Never commit actual environment files with secrets
+
+# Environment files with actual values
+.env.*
+!.env.example
+
+# Generated secrets/keys
+.keys/
+
+# Workflow backups (optional - can be committed for version control)
+# Uncomment if you want to exclude backups from git
+# workflows/*/backup-*/
+
+# Local development data
+*.log

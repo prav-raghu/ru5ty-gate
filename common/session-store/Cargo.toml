@@ -1,0 +1,21 @@
+[package]
+name = "ru5ty-gate-session-store"
+description = "Local sqlite session store and sync event queue"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+chrono = "0.4.45"
+rusqlite = { version = "0.39.0", features = ["bundled"] }
+serde_json = "1.0.151"
+thiserror.workspace = true
+tokio = { version = "1.53.1", features = ["rt", "rt-multi-thread"] }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread"] }

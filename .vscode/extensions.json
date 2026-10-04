@@ -1,0 +1,28 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "christian-kohler.path-intellisense",
+        "mikestead.dotenv",
+        "ms-vscode.vscode-typescript-next",
+        "yoavbls.pretty-ts-errors",
+        "sonarsource.sonarlint-vscode",
+        "pflannery.vscode-versionlens",
+        "gruntfuggly.todo-tree",
+        "aaron-bond.better-comments",
+        "rangav.vscode-thunder-client",
+        "humao.rest-client",
+        "antfu.iconify",
+        "ms-playwright.playwright",
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "tamasfe.even-better-toml"
+        "Anthropic.claude-code"
+    ],
+    "unwantedRecommendations": []
+}
