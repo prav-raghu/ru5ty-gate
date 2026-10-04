@@ -1,119 +1,100 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ROUTES } from "../constants/routes";
+import { authService, type LoginData } from "../services/auth.service";
 import { useAuthStore } from "../store/auth.store";
-import { apiClient } from "../services/api-client";
-
-const loginSchema = z.object({
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(1, "Password is required"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
-
-interface LoginResponse {
-    accessToken: string;
-    user: {
-        id: string;
-        username: string;
-        email: string;
-        role: string;
-    };
-}
+import { authTokenStore } from "../store/auth-token.store";
+import { toast } from "../store/toast.store";
+import { errorMessage } from "../utils/api-error";
+import { loginSchema, mfaSchema, type LoginForm, type MfaForm } from "../utils/login-validation";
+import { Button } from "../components/ui/Button";
+import { TextField } from "../components/ui/TextField";
 
 export function Login() {
     const navigate = useNavigate();
-    const setAuth = useAuthStore((s) => s.setAuth);
-    const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
-    const [errors, setErrors] = useState<Partial<LoginForm>>({});
-    const [serverError, setServerError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const setAuth = useAuthStore((state) => state.setAuth);
+    const [mfaToken, setMfaToken] = useState<string | null>(null);
 
-    const validate = (): boolean => {
-        const result = loginSchema.safeParse(form);
-        if (!result.success) {
-            const fieldErrors: Partial<LoginForm> = {};
-            result.error.issues.forEach((e) => {
-                const field = e.path[0] as keyof LoginForm;
-                fieldErrors[field] = e.message;
-            });
-            setErrors(fieldErrors);
-            return false;
-        }
-        setErrors({});
-        return true;
+    const credentials = useForm<LoginForm>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
+    const mfa = useForm<MfaForm>({ resolver: zodResolver(mfaSchema), defaultValues: { code: "" } });
+
+    const complete = async (data: LoginData): Promise<void> => {
+        authTokenStore.setToken(data.authToken);
+        const user = await authService.currentUser();
+        setAuth(user, data.authToken);
+        navigate(ROUTES.VENUES);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) return;
-
-        setLoading(true);
-        setServerError(null);
+    const submitCredentials = credentials.handleSubmit(async (values) => {
         try {
-            const data = await apiClient.post<LoginResponse>("/auth/login", form);
-            setAuth(data.user, data.accessToken);
-            navigate("/");
-        } catch {
-            setServerError("Invalid credentials. Please try again.");
-        } finally {
-            setLoading(false);
+            const data = await authService.login(values.email, values.password);
+            if (data.mfaRequired && data.mfaToken) {
+                setMfaToken(data.mfaToken);
+                return;
+            }
+            await complete(data);
+        } catch (error) {
+            authTokenStore.clearToken();
+            toast.error(errorMessage(error));
         }
-    };
+    });
+
+    const submitMfa = mfa.handleSubmit(async (values) => {
+        if (!mfaToken) {
+            return;
+        }
+        try {
+            await complete(await authService.verifyMfa(mfaToken, values.code));
+        } catch (error) {
+            authTokenStore.clearToken();
+            toast.error(errorMessage(error));
+        }
+    });
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
-                    <h1 className="text-2xl font-bold text-foreground mb-2">Admin Login</h1>
-                    <p className="text-muted-foreground mb-6">Sign in to access the admin dashboard</p>
+        <div className="flex min-h-screen items-center justify-center bg-background p-4">
+            <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-sm">
+                <h1 className="mb-2 text-2xl font-bold text-foreground">Admin Login</h1>
+                <p className="mb-6 text-muted-foreground">
+                    {mfaToken ? "Enter the code from your authenticator app" : "Sign in to access the admin dashboard"}
+                </p>
 
-                    {serverError && (
-                        <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded text-destructive text-sm">
-                            {serverError}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} noValidate>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="email">
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                value={form.email}
-                                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                                autoComplete="email"
-                            />
-                            {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="password">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                type="password"
-                                value={form.password}
-                                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                                autoComplete="current-password"
-                            />
-                            {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-2 px-4 bg-primary text-primary-foreground font-medium rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                            {loading ? "Signing in..." : "Sign in"}
-                        </button>
+                {mfaToken ? (
+                    <form onSubmit={submitMfa} noValidate className="space-y-4">
+                        <TextField
+                            label="Authenticator code"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            error={mfa.formState.errors.code?.message}
+                            {...mfa.register("code")}
+                        />
+                        <Button type="submit" className="w-full" loading={mfa.formState.isSubmitting}>
+                            Verify
+                        </Button>
                     </form>
-                </div>
+                ) : (
+                    <form onSubmit={submitCredentials} noValidate className="space-y-4">
+                        <TextField
+                            label="Email"
+                            type="email"
+                            autoComplete="username"
+                            error={credentials.formState.errors.email?.message}
+                            {...credentials.register("email")}
+                        />
+                        <TextField
+                            label="Password"
+                            type="password"
+                            autoComplete="current-password"
+                            error={credentials.formState.errors.password?.message}
+                            {...credentials.register("password")}
+                        />
+                        <Button type="submit" className="w-full" loading={credentials.formState.isSubmitting}>
+                            Sign in
+                        </Button>
+                    </form>
+                )}
             </div>
         </div>
     );

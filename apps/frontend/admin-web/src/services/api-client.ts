@@ -1,7 +1,8 @@
 import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { authTokenStore } from "../store/auth-token.store";
+import { useAuthStore } from "../store/auth.store";
 
-const API_BASE_URL = import.meta.env.VITE_ADMIN_API_BASE_URL || "http://localhost:3002";
+const API_BASE_URL = import.meta.env.VITE_ADMIN_API_BASE_URL || "http://localhost:4001";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000;
 
@@ -62,7 +63,7 @@ class ApiClient {
                 config._retryCount = config._retryCount ?? 0;
 
                 if (error.response?.status === 401) {
-                    authTokenStore.clearToken();
+                    useAuthStore.getState().clearAuth();
                     throw error;
                 }
 
